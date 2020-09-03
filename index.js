@@ -1,6 +1,6 @@
-var express = require('express');           //npm install express -- save
-var sql = require('mssql');                 //npm install mssql -- save
-var jwt = require("jsonwebtoken");          //npm install jsonwebtoken --save
+var express = require('express');           //yarn add express -- save
+var sql = require('mssql');                 //yarn add mssql -- save
+var jwt = require("jsonwebtoken");          //yarn add jsonwebtoken --save
 var app = express();
 var fs = require('fs');
 var bodyParser = require('body-parser');
