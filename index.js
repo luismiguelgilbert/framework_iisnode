@@ -6,6 +6,7 @@ var fs = require('fs');
 var bodyParser = require('body-parser');
 
 var logToFile = function(message){ fs.appendFile(process.env.logPathFile, new Date().toISOString() + '\t' + message + '\r\n', (err) => { if (err) throw err; } ); }
+
 logToFile('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
 logToFile('API starting...')
 
@@ -112,7 +113,6 @@ app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
                 ,sys_user_code: result.recordset[0].sys_user_code
                 ,sys_profile_id: result.recordset[0].sys_profile_id
             }
-            //console.dir(user)
             jwt.sign({user: user}, process.env.secretEncryptionJWT, (err, token) => {
                 if(err){
                     logToFile('JWT Error: ' + err)
@@ -258,9 +258,7 @@ app.post(process.env.iisVirtualPath+'getData', veryfyToken, function(req, res) {
                             res.status(200).send(result.recordset);
                         })
                     }catch(execp){
-                        console.log('Service Error');
-                        console.error(execp);
-                        constants.logToFile('Service Error: ' + JSON.stringify(execp))
+                        logToFile('Service Error: ' + JSON.stringify(execp))
                         res.status(400).send(execp);
                         return;
                     }
@@ -279,4 +277,4 @@ app.post(process.env.iisVirtualPath+'getData', veryfyToken, function(req, res) {
 //#endregion Version_1
 
 app.listen(process.env.PORT);
-logToFile('API started')
+logToFile('API started using port ' + process.env.PORT)
