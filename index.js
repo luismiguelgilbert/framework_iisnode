@@ -94,7 +94,7 @@ app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
     let start = new Date()
     logToFile('New Login attempt')
     logToFile('req: ' + JSON.stringify(req.body))
-    logToFile('Login: ' + req.body.sys_user_id + ' (' + req.ip + ')')
+    logToFile('Usuario: ' + req.body.sys_user_id + ' (' + req.ip + ')')
     new sql.Request(connectionPool)
     .input('sys_user_id', sql.VarChar(250), req.body.sys_user_id )
     .input('sys_user_password', sql.VarChar(100), req.body.sys_user_password )
