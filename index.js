@@ -105,33 +105,37 @@ app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
             logToFile('DB Error: ' + JSON.stringify(err.originalError.info))
             res.status(400).send(err.originalError);
             return;
-        }
-        if(result.recordset.length > 0){
-            const user = {
-                 username: req.body.sys_user_id
-                ,sys_user_code: result.recordset[0].sys_user_code
-                ,sys_profile_id: result.recordset[0].sys_profile_id
-            }
-            jwt.sign({user: user}, process.env.secretEncryptionJWT, (err, token) => {
-                if(err){
-                    logToFile('JWT Error: ' + err)
-                    res.status(400).send(err);
-                    return;
-                }else{
-                    userToken = token
-                    result.recordset[0].jwtToken = token
-                    res.setHeader('content-type', 'application/json');
-                    res.status(200).send(result.recordset);
-                }
-            })
         }else{
-            res.status(400).send('Error de Inicio de Sesión');
-            return;
+            logToFile('Welcome: ' + req.body.sys_user_id)
+            if(result.recordset.length > 0){
+                const user = {
+                     username: req.body.sys_user_id
+                    ,sys_user_code: result.recordset[0].sys_user_code
+                    ,sys_profile_id: result.recordset[0].sys_profile_id
+                }
+                jwt.sign({user: user}, process.env.secretEncryptionJWT, (err, token) => {
+                    if(err){
+                        logToFile('JWT Error: ' + err)
+                        res.status(400).send(err);
+                        return;
+                    }else{
+                        userToken = token
+                        result.recordset[0].jwtToken = token
+                        res.setHeader('content-type', 'application/json');
+                        res.status(200).send(result.recordset);
+                    }
+                })
+            }else{
+                res.status(400).send('Error de Inicio de Sesión');
+                return;
+            }
         }
+        
     })
 
 });
 app.get(process.env.iisVirtualPath+'spSysUserMainData', veryfyToken, function(req, res) {
+    logToFile("Request:  " + req.originalUrl)
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -144,7 +148,6 @@ app.get(process.env.iisVirtualPath+'spSysUserMainData', veryfyToken, function(re
             .input('sys_user_language', sql.VarChar(25), req.query.sys_user_language )
             .input('sys_user_code', sql.Int, req.query.sys_user_code )
             .execute('spSysUserMainData', (err, result) => {
-                logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf:  " + ((new Date() - start) / 1000) + ' secs')
                 if(err){
                     logToFile("Error:  " + JSON.stringify(err.originalError.info))
@@ -156,8 +159,9 @@ app.get(process.env.iisVirtualPath+'spSysUserMainData', veryfyToken, function(re
             })
         }
     })
-})
+});;
 app.get(process.env.iisVirtualPath+'spMyUnreadNotifications', veryfyToken, function(req, res) {
+    logToFile("Request:  " + req.originalUrl)
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -170,7 +174,6 @@ app.get(process.env.iisVirtualPath+'spMyUnreadNotifications', veryfyToken, funct
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .execute('spMyUnreadNotifications', (err, result) => {
-                logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf:  " + ((new Date() - start) / 1000) + ' secs')
                 if(err){
                     logToFile("Error:  " + JSON.stringify(err.originalError.info))
@@ -187,6 +190,7 @@ app.get(process.env.iisVirtualPath+'spMyUnreadNotifications', veryfyToken, funct
 
 //#region DynamicData
 app.get(process.env.iisVirtualPath+'spSysModulesSelect', veryfyToken, function(req, res) {
+    logToFile("Request:  " + req.originalUrl)
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -198,7 +202,6 @@ app.get(process.env.iisVirtualPath+'spSysModulesSelect', veryfyToken, function(r
             .input('sys_user_code', sql.Int, req.query.sys_user_code )
             .input('link_name', sql.VarChar(50), req.query.link_name )
             .execute('spSysModulesSelect', (err, result) => {
-                logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf:  " + ((new Date() - start) / 1000) + ' secs')
                 if(err){
                     logToFile("DB Error:  " + err.procName)
@@ -211,8 +214,9 @@ app.get(process.env.iisVirtualPath+'spSysModulesSelect', veryfyToken, function(r
             })
         }
     })
-})
+});
 app.post(process.env.iisVirtualPath+'getData', veryfyToken, function(req, res) {
+    logToFile("Request:  " + req.originalUrl)
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -270,7 +274,7 @@ app.post(process.env.iisVirtualPath+'getData', veryfyToken, function(req, res) {
             }
         }
     })
-})
+});
 //#endregion DynamicData
 
 //#endregion Version_1
