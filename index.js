@@ -118,6 +118,7 @@ app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
                     res.status(400).send(err);
                     return;
                 }else{
+                    logToFile('Welcome: ' + req.body.sys_user_id)
                     userToken = token
                     result.recordset[0].jwtToken = token
                     res.setHeader('content-type', 'application/json');
