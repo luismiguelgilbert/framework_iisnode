@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "compression": "^1.7.4",
     "express": "^4.17.1",
+    "express-fileupload": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
     "mssql": "^6.2.1",
     "save": "^2.4.0"
