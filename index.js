@@ -100,42 +100,39 @@ app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
     .input('sys_user_password', sql.VarChar(100), req.body.sys_user_password )
     .execute('spSysLogin', (err, result) => {
         logToFile("Request:  " + req.originalUrl)
-        logToFile("Perf:  " + ((new Date() - start) / 1000) + ' secs' )
+        logToFile("Perf spSysLogin:  " + ((new Date() - start) / 1000) + ' secs' )
         if(err){
             logToFile('DB Error: ' + JSON.stringify(err.originalError.info))
             res.status(400).send(err.originalError);
             return;
-        }else{
-            logToFile('Welcome: ' + req.body.sys_user_id)
-            if(result.recordset.length > 0){
-                const user = {
-                     username: req.body.sys_user_id
-                    ,sys_user_code: result.recordset[0].sys_user_code
-                    ,sys_profile_id: result.recordset[0].sys_profile_id
-                }
-                jwt.sign({user: user}, process.env.secretEncryptionJWT, (err, token) => {
-                    if(err){
-                        logToFile('JWT Error: ' + err)
-                        res.status(400).send(err);
-                        return;
-                    }else{
-                        userToken = token
-                        result.recordset[0].jwtToken = token
-                        res.setHeader('content-type', 'application/json');
-                        res.status(200).send(result.recordset);
-                    }
-                })
-            }else{
-                res.status(400).send('Error de Inicio de Sesión');
-                return;
-            }
         }
-        
+        if(result.recordset.length > 0){
+            const user = {
+                 username: req.body.sys_user_id
+                ,sys_user_code: result.recordset[0].sys_user_code
+                ,sys_profile_id: result.recordset[0].sys_profile_id
+            }
+            jwt.sign({user: user}, process.env.secretEncryptionJWT, (err, token) => {
+                if(err){
+                    logToFile('JWT Error: ' + err)
+                    res.status(400).send(err);
+                    return;
+                }else{
+                    logToFile('Welcome: ' + req.body.sys_user_id)
+                    userToken = token
+                    result.recordset[0].jwtToken = token
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                }
+            })
+        }else{
+            res.status(400).send('Error de Inicio de Sesión');
+            return;
+        }
     })
 
 });
 app.get(process.env.iisVirtualPath+'spSysUserMainData', veryfyToken, function(req, res) {
-    logToFile("Request:  " + req.originalUrl)
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -148,7 +145,8 @@ app.get(process.env.iisVirtualPath+'spSysUserMainData', veryfyToken, function(re
             .input('sys_user_language', sql.VarChar(25), req.query.sys_user_language )
             .input('sys_user_code', sql.Int, req.query.sys_user_code )
             .execute('spSysUserMainData', (err, result) => {
-                logToFile("Perf:  " + ((new Date() - start) / 1000) + ' secs')
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spSysUserMainData:  " + ((new Date() - start) / 1000) + ' secs')
                 if(err){
                     logToFile("Error:  " + JSON.stringify(err.originalError.info))
                     res.status(400).send(err.originalError);
@@ -159,9 +157,8 @@ app.get(process.env.iisVirtualPath+'spSysUserMainData', veryfyToken, function(re
             })
         }
     })
-});;
+})
 app.get(process.env.iisVirtualPath+'spMyUnreadNotifications', veryfyToken, function(req, res) {
-    logToFile("Request:  " + req.originalUrl)
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -174,7 +171,8 @@ app.get(process.env.iisVirtualPath+'spMyUnreadNotifications', veryfyToken, funct
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .execute('spMyUnreadNotifications', (err, result) => {
-                logToFile("Perf:  " + ((new Date() - start) / 1000) + ' secs')
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spMyUnreadNotifications:  " + ((new Date() - start) / 1000) + ' secs' )
                 if(err){
                     logToFile("Error:  " + JSON.stringify(err.originalError.info))
                     res.status(400).send(err.originalError);
@@ -190,7 +188,6 @@ app.get(process.env.iisVirtualPath+'spMyUnreadNotifications', veryfyToken, funct
 
 //#region DynamicData
 app.get(process.env.iisVirtualPath+'spSysModulesSelect', veryfyToken, function(req, res) {
-    logToFile("Request:  " + req.originalUrl)
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -202,7 +199,8 @@ app.get(process.env.iisVirtualPath+'spSysModulesSelect', veryfyToken, function(r
             .input('sys_user_code', sql.Int, req.query.sys_user_code )
             .input('link_name', sql.VarChar(50), req.query.link_name )
             .execute('spSysModulesSelect', (err, result) => {
-                logToFile("Perf:  " + ((new Date() - start) / 1000) + ' secs')
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spSysModulesSelect:  " + ((new Date() - start) / 1000) + ' secs' )
                 if(err){
                     logToFile("DB Error:  " + err.procName)
                     logToFile("Error:  " + JSON.stringify(err.originalError.info))
@@ -214,9 +212,8 @@ app.get(process.env.iisVirtualPath+'spSysModulesSelect', veryfyToken, function(r
             })
         }
     })
-});
+})
 app.post(process.env.iisVirtualPath+'getData', veryfyToken, function(req, res) {
-    logToFile("Request:  " + req.originalUrl)
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -274,7 +271,233 @@ app.post(process.env.iisVirtualPath+'getData', veryfyToken, function(req, res) {
             }
         }
     })
-});
+})
+app.post(process.env.iisVirtualPath+'getLookupData', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            let query = ''
+            new sql.Request(connectionPool)
+            .input('link_name', sql.VarChar(50), req.body.link_name )
+            .input('db_column', sql.VarChar(50), req.body.db_column )
+            .input('sys_user_code', sql.Int, req.body.sys_user_code )
+            .input('sys_company_id', sql.Int, req.body.sys_company_id )
+            .execute('spGetModuleColumnSearchData', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spGetModuleColumnSearchData:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                try{
+                    logToFile('Query: ' + result.recordset[0].query);
+                    query = result.recordset[0].query
+                    //Run QUERY
+                    new sql.Request(connectionPool)
+                    .query(query, (queryError, queryR) => {
+                        logToFile("Perf internalQuery:  " + ((new Date() - start) / 1000) + ' secs')
+                        if(queryError){
+                            logToFile('Database Error inside getLookupData: ' + JSON.stringify(queryError.originalError.info))
+                            res.status(400).send(queryError.originalError);
+                            return;
+                        }
+                        res.setHeader('content-type', 'application/json');
+                        res.status(200).send(queryR.recordset);
+                    })
+                }catch(execp){
+                    logToFile("Service Error")
+                    logToFile(execp)
+                    logToFile("Error:  " + JSON.stringify(execp))
+                    res.status(400).send(execp);
+                    return;
+                }
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSysModulesColumnsUserUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('link_name', sql.VarChar(50), req.body.link_name )
+                .input('sys_user_code', sql.Int, req.body.sys_user_code )
+                .input('columns', sql.VarChar(sql.MAX), req.body.columns )
+                .execute('spSysModulesColumnsUserUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spSysModulesColumnsUserUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSysModulesFiltersUserUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('link_name', sql.VarChar(50), req.body.link_name )
+                .input('sys_user_code', sql.Int, req.body.sys_user_code )
+                .input('filter_id', sql.Int, req.body.filter_id )
+                .input('name', sql.VarChar(250), req.body.name )
+                .input('conditions', sql.VarChar(sql.MAX), req.body.conditions )
+                .execute('spSysModulesFiltersUserUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spSysModulesFiltersUserUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSysModulesFiltersUserDelete', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('link_name', sql.VarChar(50), req.body.link_name )
+                .input('sys_user_code', sql.Int, req.body.sys_user_code )
+                .input('filter_id', sql.Int, req.body.filter_id )
+                .execute('spSysModulesFiltersUserDelete', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spSysModulesFiltersUserDelete:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSysModulesFiltersUserDefaultUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('link_name', sql.VarChar(50), req.body.link_name )
+                .input('sys_user_code', sql.Int, req.body.sys_user_code )
+                .input('filter_id', sql.Int, req.body.filter_id )
+                .execute('spSysModulesFiltersUserDefaultUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spSysModulesFiltersUserDefaultUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSysModulesFiltersUserDefaultUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('link_name', sql.VarChar(50), req.body.link_name )
+                .input('sys_user_code', sql.Int, req.body.sys_user_code )
+                .input('filter_id', sql.Int, req.body.filter_id )
+                .execute('spSysModulesFiltersUserDefaultUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spSysModulesFiltersUserDefaultUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
 //#endregion DynamicData
 
 //#endregion Version_1
