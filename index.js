@@ -350,7 +350,7 @@ app.post(process.env.iisVirtualPath+'getData', veryfyToken, function(req, res) {
                 .input('orderBy', sql.VarChar(50), req.body.orderBy )
                 .execute('spGetDataSelect', (err, result) => {
                     if(err){
-                        logToFile("DB Error:  " + err.procName)
+                        logToFile("DB Error 1:  " + err.procName)
                         logToFile("Error:  " + JSON.stringify(err.originalError.info))
                         res.status(400).send(err.originalError);
                         return;
@@ -358,10 +358,11 @@ app.post(process.env.iisVirtualPath+'getData', veryfyToken, function(req, res) {
                     try{
                         selectPart = result.recordset[0].selectPart
                         //Run QUERY
+                        //logToFile("selectPart: " + selectPart)//deja el query en log.txt
                         new sql.Request(connectionPool)
                         .query(selectPart, (err, result) => {
                             if(err){
-                                logToFile("DB Error:  " + err.procName)
+                                logToFile("DB Error 2:  " + selectPart)
                                 logToFile("Error:  " + JSON.stringify(err.originalError.info))
                                 res.status(400).send(err.originalError);
                                 return;
