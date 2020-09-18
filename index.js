@@ -1292,6 +1292,7 @@ app.post(process.env.iisVirtualPath+'spAccPeriodsUpdate', veryfyToken, function(
 })
 //#endregion PERIODS
 
+//#region SCHOENSTATT
 
 //#region SCHOENSTATT_PERSONAS
 app.get(process.env.iisVirtualPath+'spSchPersonasSelectEdit', veryfyToken, function(req, res) {
@@ -1361,6 +1362,279 @@ app.post(process.env.iisVirtualPath+'spSchPersonasUpdate', veryfyToken, function
 })
 //#endregion SCHOENSTATT_PERSONAS
 
+//#region SCHOENSTATT_GROUPS
+app.get(process.env.iisVirtualPath+'spSchGroupsSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', sql.Bit, req.query.editMode )
+            .execute('spSchGroupsSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spSchGroupsSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSchGroupsUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spSchGroupsUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spSchGroupsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion SCHOENSTATT_GROUPS
+
+//#region SCHOENSTATT_SECTORES
+app.get(process.env.iisVirtualPath+'spSchSectoresSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', sql.Bit, req.query.editMode )
+            .execute('spSchSectoresSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spSchSectoresSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSchSectoresUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spSchSectoresUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spSchSectoresUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion SCHOENSTATT_SECTORES
+
+//#region SCHOENSTATT_APOSTOLADOS
+app.get(process.env.iisVirtualPath+'spSchApostoladosSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', sql.Bit, req.query.editMode )
+            .execute('spSchApostoladosSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spSchApostoladosSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSchApostoladosUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spSchApostoladosUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spSchApostoladosUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion SCHOENSTATT_APOSTOLADOS
+
+//#region SCHOENSTATT_FORMACIONES
+app.get(process.env.iisVirtualPath+'spSchFormacionesSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', sql.Bit, req.query.editMode )
+            .execute('spSchFormacionesSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spSchFormacionesSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSchFormacionesUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spSchFormacionesUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spSchFormacionesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion SCHOENSTATT_FORMACIONES
+
+//#region SCHOENSTATT
 
 //#endregion Version_1_0_0
 
