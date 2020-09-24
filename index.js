@@ -296,6 +296,59 @@ app.post(process.env.iisVirtualPath+'uploadFile', veryfyToken, function(req, res
         }
     })
 })
+app.get(process.env.iisVirtualPath+'downloadFile', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            logToFile("Request:  " + req.originalUrl)
+            logToFile("Perf downloadFile:  " + ((new Date() - start) / 1000) + ' secs' )
+            res.download((process.env.filesPath + "//" + req.query.fileName))
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spAttachGenerateID', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('original_file_name', sql.VarChar(500), req.body.original_file_name )
+                .input('file_type', sql.VarChar(sql.MAX), req.body.file_type )
+                .input('file_size', sql.VarChar(sql.Int), req.body.file_size )
+                .input('row_id', sql.Int, req.body.row_id )
+                .execute('spAttachGenerateID', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spAttachGenerateID:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+
 //#endregion SESSION_OTHERS
 
 //#region DynamicData
@@ -885,7 +938,7 @@ app.post(process.env.iisVirtualPath+'spSysCompaniesUpdate', veryfyToken, functio
 })
 //#endregion COMPANIES
 
-//#region COMPANIES
+//#region MODULES
 app.get(process.env.iisVirtualPath+'spSysModulesSelectEdit', veryfyToken, function(req, res) {
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
@@ -1292,6 +1345,78 @@ app.post(process.env.iisVirtualPath+'spAccPeriodsUpdate', veryfyToken, function(
 })
 //#endregion PERIODS
 
+
+//#region PARTNERS
+app.get(process.env.iisVirtualPath+'spPartnerMasterSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', sql.Bit, req.query.editMode )
+            .execute('spPartnerMasterSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spPartnerMasterSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spPartnerMasterUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spPartnerMasterUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spPartnerMasterUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion CHART_ACCOUNTS
+
+
+//#endregion Version_1_0_0
+
 //#region SCHOENSTATT
 
 //#region SCHOENSTATT_PERSONAS
@@ -1634,9 +1759,8 @@ app.post(process.env.iisVirtualPath+'spSchFormacionesUpdate', veryfyToken, funct
 })
 //#endregion SCHOENSTATT_FORMACIONES
 
-//#region SCHOENSTATT
+//#endregion SCHOENSTATT
 
-//#endregion Version_1_0_0
 
 app.listen(process.env.PORT);
 logToFile('API started using port ' + process.env.PORT)
