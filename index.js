@@ -1345,7 +1345,6 @@ app.post(process.env.iisVirtualPath+'spAccPeriodsUpdate', veryfyToken, function(
 })
 //#endregion PERIODS
 
-
 //#region PARTNERS
 app.get(process.env.iisVirtualPath+'spPartnerMasterSelectEdit', veryfyToken, function(req, res) {
     let start = new Date()
@@ -1412,7 +1411,76 @@ app.post(process.env.iisVirtualPath+'spPartnerMasterUpdate', veryfyToken, functi
         }
     })
 })
-//#endregion CHART_ACCOUNTS
+//#endregion PARTNERS
+
+//#region ITEMS
+app.get(process.env.iisVirtualPath+'spInvMasterSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', sql.Bit, req.query.editMode )
+            .execute('spInvMasterSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spInvMasterSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spInvMasterUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spInvMasterUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spInvMasterUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion ITEMS
+
 
 
 //#endregion Version_1_0_0
