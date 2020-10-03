@@ -679,7 +679,7 @@ app.get(process.env.iisVirtualPath+'spSysUsersSelectEdit', veryfyToken, function
             .input('userCode', sql.Int, req.query.userCode )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSysUsersSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSysUsersSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -817,7 +817,7 @@ app.get(process.env.iisVirtualPath+'spSysProfilesSelectEdit', veryfyToken, funct
             .input('userCode', sql.Int, req.query.userCode )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSysProfilesSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSysProfilesSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -884,7 +884,7 @@ app.get(process.env.iisVirtualPath+'spSysCompaniesSelectEdit', veryfyToken, func
             .input('userCode', sql.Int, req.query.userCode )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSysCompaniesSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSysCompaniesSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -951,7 +951,7 @@ app.get(process.env.iisVirtualPath+'spSysModulesSelectEdit', veryfyToken, functi
             .input('userCode', sql.Int, req.query.userCode )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSysModulesSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSysModulesSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1019,7 +1019,7 @@ app.get(process.env.iisVirtualPath+'spNotificationsSelectEdit', veryfyToken, fun
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spNotificationsSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spNotificationsSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1087,7 +1087,7 @@ app.get(process.env.iisVirtualPath+'spAccAccountsSelectEdit', veryfyToken, funct
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spAccAccountsSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spAccAccountsSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1155,7 +1155,7 @@ app.get(process.env.iisVirtualPath+'spSysTaxesSelectEdit', veryfyToken, function
             //.input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSysTaxesSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSysTaxesSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1223,7 +1223,7 @@ app.get(process.env.iisVirtualPath+'spAccTaxesSelectEdit', veryfyToken, function
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spAccTaxesSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spAccTaxesSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1291,7 +1291,7 @@ app.get(process.env.iisVirtualPath+'spAccPeriodsSelectEdit', veryfyToken, functi
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spAccPeriodsSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spAccPeriodsSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1359,7 +1359,7 @@ app.get(process.env.iisVirtualPath+'spPartnerMasterSelectEdit', veryfyToken, fun
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spPartnerMasterSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spPartnerMasterSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1427,7 +1427,7 @@ app.get(process.env.iisVirtualPath+'spInvMasterSelectEdit', veryfyToken, functio
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spInvMasterSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spInvMasterSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1495,7 +1495,7 @@ app.get(process.env.iisVirtualPath+'spWhMasterSelectEdit', veryfyToken, function
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spWhMasterSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spWhMasterSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1563,7 +1563,7 @@ app.get(process.env.iisVirtualPath+'spInvMasterUoMSelectEdit', veryfyToken, func
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spInvMasterUoMSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spInvMasterUoMSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1631,7 +1631,7 @@ app.get(process.env.iisVirtualPath+'spInvMasterBrandsSelectEdit', veryfyToken, f
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spInvMasterBrandsSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spInvMasterBrandsSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1699,7 +1699,7 @@ app.get(process.env.iisVirtualPath+'spinvMasterTypesSelectEdit', veryfyToken, fu
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spinvMasterTypesSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spinvMasterTypesSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1762,12 +1762,17 @@ app.get(process.env.iisVirtualPath+'spMktPRSelectEdit', veryfyToken, function(re
             logToFile(jwtError)
             res.status(403).send(jwtError);
         }else{
+            logToFile("userCode:  " + req.query.userCode)
+            logToFile("userCompany:  " + req.query.userCompany)
+            logToFile("userLanguage:  " + req.query.userLanguage)
+            logToFile("row_id:  " + req.query.row_id)
+            logToFile("editMode:  " + req.query.editMode)
             new sql.Request(connectionPool)
             .input('userCode', sql.Int, req.query.userCode )
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spMktPRSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spMktPRSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1783,7 +1788,7 @@ app.get(process.env.iisVirtualPath+'spMktPRSelectEdit', veryfyToken, function(re
         }
     })
 })
-app.post(process.env.iisVirtualPath+'spMktPRSelectUpdate', veryfyToken, function(req, res) {
+app.post(process.env.iisVirtualPath+'spMktPRUpdate', veryfyToken, function(req, res) {
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -1797,9 +1802,9 @@ app.post(process.env.iisVirtualPath+'spMktPRSelectUpdate', veryfyToken, function
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
-                .execute('spMktPRSelectUpdate', (err, result) => {
+                .execute('spMktPRUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
-                    logToFile("Perf spMktPRSelectUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+                    logToFile("Perf spMktPRUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
                         logToFile("DB Error:  " + err.procName)
@@ -1839,7 +1844,7 @@ app.get(process.env.iisVirtualPath+'spSchPersonasSelectEdit', veryfyToken, funct
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSchPersonasSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSchPersonasSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1907,7 +1912,7 @@ app.get(process.env.iisVirtualPath+'spSchGroupsSelectEdit', veryfyToken, functio
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSchGroupsSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSchGroupsSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -1975,7 +1980,7 @@ app.get(process.env.iisVirtualPath+'spSchSectoresSelectEdit', veryfyToken, funct
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSchSectoresSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSchSectoresSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -2043,7 +2048,7 @@ app.get(process.env.iisVirtualPath+'spSchApostoladosSelectEdit', veryfyToken, fu
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSchApostoladosSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSchApostoladosSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -2111,7 +2116,7 @@ app.get(process.env.iisVirtualPath+'spSchFormacionesSelectEdit', veryfyToken, fu
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', sql.Bit, req.query.editMode )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spSchFormacionesSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spSchFormacionesSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
