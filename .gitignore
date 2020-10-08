@@ -1,6 +1,7 @@
 # iisnode
 /iisnode
 /node_modules
+/tempfiles
 .env
 web.config
 

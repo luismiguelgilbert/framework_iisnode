@@ -5,6 +5,7 @@
     "express-fileupload": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
     "mssql": "^6.2.1",
-    "save": "^2.4.0"
+    "save": "^2.4.0",
+    "ws": "^7.3.1"
   }
 }

@@ -1,16 +1,23 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';     //allows to get files from https even if certificate invalid
 var fileUpload = require('express-fileupload')      //yarn add express-fileupload
 var compression = require('compression')            //yarn add compression
 var express = require('express');                   //yarn add express -- save
 var sql = require('mssql');                         //yarn add mssql -- save
 var jwt = require("jsonwebtoken");                  //yarn add jsonwebtoken --save
+var webSocket = require("ws");                      //yarn add ws --save
+//var emlFormat = require("eml-format");              //yarn add eml-format --save
+//var axios = require('axios');                     //yarn add jsonwebtoken --save
+//var url = require('url');
+//var http = require('http');
+//var https = require('https');
 var app = express();
 var fs = require('fs');
 var bodyParser = require('body-parser');
-
 var logToFile = function(message){ fs.appendFile(process.env.logPathFile, new Date().toISOString() + '\t' + message + '\r\n', (err) => { if (err) throw err; } ); }
 
+
 logToFile('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-logToFile('API starting...')
+logToFile('API starting2...')
 logToFile('Express Version: ' + require('express/package').version)
 logToFile('Node Version: ' + process.version)
 logToFile('Process ID: ' + process.pid)
@@ -100,8 +107,7 @@ app.get(process.env.iisVirtualPath+'status', function (req, res) {
 //#region SESSION_OTHERS
 app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
     let start = new Date()
-    logToFile('New Login attempt')
-    logToFile('Usuario: ' + req.body.sys_user_id + ' (' + req.ip + ')')
+    logToFile('!!! New Login attempt from ' + 'Usuario: ' + req.body.sys_user_id + ' (' + req.ip + ')')
     new sql.Request(connectionPool)
     .input('sys_user_id', sql.VarChar(250), req.body.sys_user_id )
     .input('sys_user_password', sql.VarChar(100), req.body.sys_user_password )
@@ -109,7 +115,11 @@ app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
         logToFile("Request:  " + req.originalUrl)
         logToFile("Perf spSysLogin:  " + ((new Date() - start) / 1000) + ' secs' )
         if(err){
-            logToFile('DB Error: ' + JSON.stringify(err.originalError.info))
+            if(err&&err.originalError&&err.originalError.info){
+                logToFile('DB Error: ' + JSON.stringify(err.originalError.info))
+            }else{
+                logToFile('DB Error: ' + JSON.stringify(err.originalError))
+            }
             res.status(400).send(err.originalError);
             return;
         }
@@ -348,7 +358,6 @@ app.post(process.env.iisVirtualPath+'spAttachGenerateID', veryfyToken, function(
         }
     })
 })
-
 //#endregion SESSION_OTHERS
 
 //#region DynamicData
@@ -1826,7 +1835,76 @@ app.post(process.env.iisVirtualPath+'spMktPRUpdate', veryfyToken, function(req, 
 })
 //#endregion PURCHASE_REQUESTS
 
+//#region PURCHASE_ORDERS
+app.get(process.env.iisVirtualPath+'spMktPOSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spMktPOSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spMktPOSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spMktPOUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spMktPOUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spMktPOUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion PURCHASE_ORDERS
+
 //#endregion Version_1_0_0
+
 
 //#region casLEGAL
 
@@ -2594,3 +2672,27 @@ app.post(process.env.iisVirtualPath+'spSchFormacionesUpdate', veryfyToken, funct
 
 app.listen(process.env.PORT);
 logToFile('API started using port ' + process.env.PORT)
+
+//initialize the WebSocket server instance
+//var wss = new WebSocket.Server({ server });
+logToFile('Starting Websocket Server...');
+var wss = new webSocket.Server({ port: 3000 });
+//var wss = new webSocket.Server({ app });
+//var wss = new webSocket.Server({ port: process.env.PORT });
+logToFile('Websocket Server created');
+//logToFile(JSON.stringify(wss));
+
+wss.on('connection', function connection(ws) {
+    logToFile('!!!!!!!!!!!!!!!!!!!!!! Websocket Server Connection...');
+    ws.on('message', function incoming(data) {
+        logToFile('************* mensaje recibido');
+        logToFile(JSON.stringify(data));
+        wss.clients.forEach(function each(client) {
+            logToFile(client.readyState === webSocket.OPEN);
+            logToFile(JSON.stringify(client));
+            if (client.readyState === webSocket.OPEN) {
+                client.send(data);
+            }
+        });
+    });
+});
