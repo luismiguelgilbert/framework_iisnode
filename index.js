@@ -1,10 +1,11 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';     //allows to get files from https even if certificate invalid
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';     //allows to get files from https even if certificate invalid
 var fileUpload = require('express-fileupload')      //yarn add express-fileupload
 var compression = require('compression')            //yarn add compression
 var express = require('express');                   //yarn add express -- save
 var sql = require('mssql');                         //yarn add mssql -- save
 var jwt = require("jsonwebtoken");                  //yarn add jsonwebtoken --save
-var webSocket = require("ws");                      //yarn add ws --save
+//var socketIO = require("socket.io");                      //yarn add socket.io --save
+var WebSocket  = require("ws");                      //yarn add ws --save
 //var emlFormat = require("eml-format");              //yarn add eml-format --save
 //var axios = require('axios');                     //yarn add jsonwebtoken --save
 //var url = require('url');
@@ -2670,30 +2671,22 @@ app.post(process.env.iisVirtualPath+'spSchFormacionesUpdate', veryfyToken, funct
 //#endregion SCHOENSTATT
 
 
-app.listen(process.env.PORT);
+const server = app.listen(process.env.PORT);
 logToFile('API started using port ' + process.env.PORT)
 
-//initialize the WebSocket server instance
-//var wss = new WebSocket.Server({ server });
+//#region WebSocket
 logToFile('Starting Websocket Server...');
-var wss = new webSocket.Server({ port: process.env.wsSocketPort });
-
-//var wss = new webSocket.Server({ app });
-//var wss = new webSocket.Server({ port: process.env.PORT });
-logToFile('Websocket Server created');
-//logToFile(JSON.stringify(wss));
-
-wss.on('connection', function connection(ws) {
+const WebSocketServer = new WebSocket.Server({server})//initialize the WebSocket server instance
+logToFile('!!!!!!!!!!!!!!!!!!!!Websocket Server created!!');
+Object.keys(WebSocketServer).map(x=>{
+    logToFile(x);
+    try{
+        logToFile(JSON.stringify(WebSocketServer[x]));
+    }catch(ex){
+        logToFile(WebSocketServer[x]);
+    }
+})
+WebSocketServer.on('connection', ws => {
     logToFile('!!!!!!!!!!!!!!!!!!!!!! Websocket Server Connection...');
-    ws.on('message', function incoming(data) {
-        logToFile('************* mensaje recibido');
-        logToFile(JSON.stringify(data));
-        wss.clients.forEach(function each(client) {
-            logToFile(client.readyState === webSocket.OPEN);
-            logToFile(JSON.stringify(client));
-            if (client.readyState === webSocket.OPEN) {
-                client.send(data);
-            }
-        });
-    });
-});
+})
+//#endregion WebSocket
