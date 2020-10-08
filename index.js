@@ -2676,7 +2676,7 @@ logToFile('API started using port ' + process.env.PORT)
 //initialize the WebSocket server instance
 //var wss = new WebSocket.Server({ server });
 logToFile('Starting Websocket Server...');
-var wss = new webSocket.Server({ port: 3000 });
+var wss = new webSocket.Server({ port: 5000 });
 //var wss = new webSocket.Server({ app });
 //var wss = new webSocket.Server({ port: process.env.PORT });
 logToFile('Websocket Server created');
