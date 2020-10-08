@@ -2688,5 +2688,8 @@ Object.keys(WebSocketServer).map(x=>{
 })
 WebSocketServer.on('connection', ws => {
     logToFile('!!!!!!!!!!!!!!!!!!!!!! Websocket Server Connection...');
+    ws.on('message', message => {
+        logToFile('@@@@@@@@Message: ' + message);
+    });
 })
 //#endregion WebSocket
