@@ -2678,18 +2678,18 @@ logToFile('API started using port ' + process.env.PORT)
 logToFile('Starting Websocket Server...');
 const WebSocketServer = new WebSocket.Server({server})//initialize the WebSocket server instance
 logToFile('!!!!!!!!!!!!!!!!!!!!Websocket Server created!!');
-Object.keys(WebSocketServer).map(x=>{
-    logToFile(x);
-    try{
-        logToFile(JSON.stringify(WebSocketServer[x]));
-    }catch(ex){
-        logToFile(WebSocketServer[x]);
-    }
-})
+
 WebSocketServer.on('connection', ws => {
     logToFile('!!!!!!!!!!!!!!!!!!!!!! Websocket Server Connection...');
     ws.on('message', message => {
         logToFile('@@@@@@@@Message: ' + message);
+        //ws.send(message)//send message to All
+
+        WebSocketServer.clients.forEach(function each(client) {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
     });
 })
 //#endregion WebSocket
