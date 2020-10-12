@@ -36,7 +36,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-var connectionPool = new sql.ConnectionPool(process.env.dbConfig, (err, pool) => {
+var connectionPool = new sql.ConnectionPool(JSON.parse(process.env.dbConfig), (err, pool) => {
     if(err){
         logToFile('Error creating SQL connectionPool:' + err)
     }else{
@@ -1904,6 +1904,79 @@ app.post(process.env.iisVirtualPath+'spMktPOUpdate', veryfyToken, function(req, 
 })
 //#endregion PURCHASE_ORDERS
 
+
+//#region INVENTORY_INCOMING 
+app.get(process.env.iisVirtualPath+'spInvKardexSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spInvKardexSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spInvKardexSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spInvKardexUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                logToFile("caseID:  " + req.query.caseID)
+                logToFile("lineID:  " + req.query.lineID)
+
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('caseID', sql.Int, req.body.caseID )
+                .input('lineID', sql.Int, req.body.lineID )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spInvKardexUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spInvKardexUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion INVENTORY_INCOMING
+
 //#endregion Version_1_0_0
 
 
@@ -2675,21 +2748,61 @@ const server = app.listen(process.env.PORT);
 logToFile('API started using port ' + process.env.PORT)
 
 //#region WebSocket
+function addWebsocketConnection(newConnection){
+    try{
+        let fileContent = JSON.parse(fs.readFileSync(process.env.websocketsFile));
+        fileContent.connections.push(newConnection)
+        fs.writeFileSync(process.env.websocketsFile,JSON.stringify(fileContent))
+    }catch(ex){
+        logToFile('xxx Error en addWebsocketConnection xxx');
+        logToFile(JSON.stringify(ex));
+    }
+}
+function removeWebsocketConnection(userID){
+    try{
+        let fileContent = JSON.parse(fs.readFileSync(process.env.websocketsFile));
+        fileContent.connections = fileContent.connections.filter(x => x.userData.userCode != userID)
+        fs.writeFileSync(process.env.websocketsFile,JSON.stringify(fileContent))
+    }catch(ex){
+        logToFile('xxx Error en removeWebsocketConnection xxx');
+        logToFile(JSON.stringify(ex));
+    }
+}
+
+
+//#region CreateServer
 logToFile('Starting Websocket Server...');
 const WebSocketServer = new WebSocket.Server({server})//initialize the WebSocket server instance
 logToFile('!!!!!!!!!!!!!!!!!!!!Websocket Server created!!');
+//#endregion CreateServer
 
-WebSocketServer.on('connection', ws => {
-    logToFile('!!!!!!!!!!!!!!!!!!!!!! Websocket Server Connection...');
+WebSocketServer.on('connection', (ws,request) => {   
+    let startIndex = parseInt(request.url.indexOf('userid'));
+    startIndex = startIndex + 7;
+    let userID = request.url.substring(startIndex,1000)
+    let wsID = request.headers['sec-websocket-key']
+    let userData = {
+         "userCode": userID
+        ,"wsID": wsID
+    }
+    ws['userData'] = userData
+    addWebsocketConnection(ws)
+
     ws.on('message', message => {
-        logToFile('@@@@@@@@Message: ' + message);
+        let fileContent = JSON.parse(fs.readFileSync(process.env.websocketsFile));
         //ws.send(message)//send message to All
 
         WebSocketServer.clients.forEach(function each(client) {
-            if (client.readyState === WebSocket.OPEN) {
+            //valida que exista, y que usuario esté en archivo de conexiones
+            if (client.readyState === WebSocket.OPEN && fileContent.connections.some(x=>x.userData.userCode==client.userData.userCode)) {
+                logToFile('Enviar mensaje:' + client.userData.userCode);
                 client.send(message);
             }
         });
     });
+
+    ws.on('close', (reasonCode,userData) => {
+        removeWebsocketConnection(userData)
+    })
 })
 //#endregion WebSocket
