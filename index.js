@@ -1904,7 +1904,6 @@ app.post(process.env.iisVirtualPath+'spMktPOUpdate', veryfyToken, function(req, 
 })
 //#endregion PURCHASE_ORDERS
 
-
 //#region INVENTORY_INCOMING 
 app.get(process.env.iisVirtualPath+'spInvKardexSelectEdit', veryfyToken, function(req, res) {
     let start = new Date()
@@ -1935,7 +1934,38 @@ app.get(process.env.iisVirtualPath+'spInvKardexSelectEdit', veryfyToken, functio
         }
     })
 })
-app.post(process.env.iisVirtualPath+'spInvKardexUpdate', veryfyToken, function(req, res) {
+app.get(process.env.iisVirtualPath+'spInvKardexSelectPending', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('partnerID', sql.Int, req.query.partnerID )
+            .input('whID', sql.Int, req.query.whID )
+            .input('direction', sql.Int, req.query.direction )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spInvKardexSelectPending', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spInvKardexSelectPending:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spInvKardexIncomingUpdate', veryfyToken, function(req, res) {
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -1944,18 +1974,14 @@ app.post(process.env.iisVirtualPath+'spInvKardexUpdate', veryfyToken, function(r
             res.status(403).send(jwtError);
         }else{
             try{
-                logToFile("caseID:  " + req.query.caseID)
-                logToFile("lineID:  " + req.query.lineID)
-
                 new sql.Request(connectionPool)
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
-                .input('caseID', sql.Int, req.body.caseID )
-                .input('lineID', sql.Int, req.body.lineID )
+                .input('row_id', sql.Int, req.body.row_id )
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
-                .execute('spInvKardexUpdate', (err, result) => {
+                .execute('spInvKardexIncomingUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
-                    logToFile("Perf spInvKardexUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+                    logToFile("Perf spInvKardexIncomingUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
                         logToFile("DB Error:  " + err.procName)
@@ -2362,9 +2388,6 @@ app.post(process.env.iisVirtualPath+'spCasCasesTasksUpdate', veryfyToken, functi
             res.status(403).send(jwtError);
         }else{
             try{
-                logToFile("caseID:  " + req.query.caseID)
-                logToFile("lineID:  " + req.query.lineID)
-
                 new sql.Request(connectionPool)
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
