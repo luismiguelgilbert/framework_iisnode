@@ -2303,7 +2303,7 @@ app.post(process.env.iisVirtualPath+'spMktPORetUpdate', veryfyToken, function(re
 //#endregion PURCHASE_ORDERS_RETURNS
 
 //#region INVENTORY_INCOMING 
-app.get(process.env.iisVirtualPath+'spInvKardexSelectEdit', veryfyToken, function(req, res) {
+app.get(process.env.iisVirtualPath+'spInvKardexIncomingSelectEdit', veryfyToken, function(req, res) {
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
         if(jwtError){
@@ -2317,9 +2317,9 @@ app.get(process.env.iisVirtualPath+'spInvKardexSelectEdit', veryfyToken, functio
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
             .input('row_id', sql.Int, req.query.row_id )
             .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
-            .execute('spInvKardexSelectEdit', (err, result) => {
+            .execute('spInvKardexIncomingSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
-                logToFile("Perf spInvKardexSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                logToFile("Perf spInvKardexIncomingSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
                 if(err){
                     logToFile("DB Error:  " + err.procName)
                     logToFile("Error:  " + JSON.stringify(err.originalError.info))
@@ -2400,6 +2400,74 @@ app.post(process.env.iisVirtualPath+'spInvKardexIncomingUpdate', veryfyToken, fu
     })
 })
 //#endregion INVENTORY_INCOMING
+
+//#region INVENTORY_OUTGOING
+app.get(process.env.iisVirtualPath+'spInvKardexOutgoingSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spInvKardexOutgoingSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spInvKardexOutgoingSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spInvKardexOutgoingUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spInvKardexOutgoingUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spInvKardexOutgoingUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion INVENTORY_OUTGOING
 
 //#region INVENTORY_QUERY
 app.get(process.env.iisVirtualPath+'spInvQueryUserWHSelect', veryfyToken, function(req, res) {
