@@ -5,6 +5,7 @@
 .env
 web.config
 ./websockets.json
+websockets.json
 
 # Log files
 log.txt
