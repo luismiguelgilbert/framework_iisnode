@@ -4,6 +4,7 @@
 /tempfiles
 .env
 web.config
+websockets.json
 
 # Log files
 log.txt
