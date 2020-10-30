@@ -3140,7 +3140,7 @@ app.post(process.env.iisVirtualPath+'spCasCasesUpdate', veryfyToken, function(re
 })
 //#endregion CasCases
 
-//#region casCasesTasks (es especial porque se envían 2 números, en vez de row_id)
+//#region casCasesTasks
 app.get(process.env.iisVirtualPath+'spCasCasesTasksSelectEdit', veryfyToken, function(req, res) {
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
@@ -3153,8 +3153,7 @@ app.get(process.env.iisVirtualPath+'spCasCasesTasksSelectEdit', veryfyToken, fun
             .input('userCode', sql.Int, req.query.userCode )
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
-            .input('caseID', sql.Int, req.query.caseID )
-            .input('lineID', sql.Int, req.query.lineID )
+            .input('row_id', sql.Int, req.query.row_id )
             .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
             .execute('spCasCasesTasksSelectEdit', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
@@ -3183,8 +3182,7 @@ app.post(process.env.iisVirtualPath+'spCasCasesTasksUpdate', veryfyToken, functi
                 new sql.Request(connectionPool)
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
-                .input('caseID', sql.Int, req.body.caseID )
-                .input('lineID', sql.Int, req.body.lineID )
+                .input('row_id', sql.Int, req.body.row_id )
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasCasesTasksUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
