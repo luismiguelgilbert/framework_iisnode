@@ -2559,7 +2559,35 @@ app.get(process.env.iisVirtualPath+'spInvQueryWhIDInvIDGetData', veryfyToken, fu
         }
     })
 })
-
+app.get(process.env.iisVirtualPath+'spInvQueryWhIDInvIDGetLotData', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('whID', sql.Int, req.query.whID )
+            .input('invID', sql.Int, req.query.invID )
+            .execute('spInvQueryWhIDInvIDGetLotData', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spInvQueryWhIDInvIDGetLotData:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
 //#endregion INVENTORY_QUERY
 
 //#region ACCMOVES
