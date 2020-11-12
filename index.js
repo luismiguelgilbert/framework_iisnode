@@ -1,16 +1,20 @@
-//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';     //allows to get files from https even if certificate invalid
-var fileUpload = require('express-fileupload')      //yarn add express-fileupload
-var compression = require('compression')            //yarn add compression
-var express = require('express');                   //yarn add express -- save
-var sql = require('mssql');                         //yarn add mssql -- save
-var jwt = require("jsonwebtoken");                  //yarn add jsonwebtoken --save
-//var socketIO = require("socket.io");                      //yarn add socket.io --save
-var WebSocket  = require("ws");                      //yarn add ws --save
-//var emlFormat = require("eml-format");              //yarn add eml-format --save
-//var axios = require('axios');                     //yarn add jsonwebtoken --save
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';       //allows to get files from https even if certificate invalid
+var fileUpload = require('express-fileupload')          //yarn add express-fileupload
+var compression = require('compression')                //yarn add compression
+var express = require('express');                       //yarn add express -- save
+var sql = require('mssql');                             //yarn add mssql -- save
+var jwt = require("jsonwebtoken");                      //yarn add jsonwebtoken --save
+var request = require('request');                       //yarn add request --save
+//var axios = require('axios');                         //yarn add axios --save
+//var curl = require('curl');                           //yarn add curl --save
+//var superagent = require('superagent');               //yarn add superagent --save
+var WebSocket  = require("ws");                         //yarn add ws --save
+var nodemailer = require("nodemailer");                 //yarn add nodemailer --save
+//var emlFormat = require("eml-format");                //yarn add eml-format --save
+//var socketIO = require("socket.io");                  //yarn add socket.io --save
 //var url = require('url');
 //var http = require('http');
-//var https = require('https');
+var https = require('https');
 var app = express();
 var fs = require('fs');
 var bodyParser = require('body-parser');
@@ -321,6 +325,20 @@ app.get(process.env.iisVirtualPath+'downloadFile', veryfyToken, function(req, re
         }
     })
 })
+app.get(process.env.iisVirtualPath+'downloadTempFile', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            logToFile("Request:  " + req.originalUrl)
+            logToFile("Perf downloadFile:  " + ((new Date() - start) / 1000) + ' secs' )
+            res.download((process.env.tempFilesPath + "//" + req.query.fileName))
+        }
+    })
+})
 app.post(process.env.iisVirtualPath+'spAttachGenerateID', veryfyToken, function(req, res) {
     let start = new Date()
     jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
@@ -350,6 +368,128 @@ app.post(process.env.iisVirtualPath+'spAttachGenerateID', veryfyToken, function(
                     res.setHeader('content-type', 'application/json');
                     res.status(200).send(result.recordset);
                 })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.get(process.env.iisVirtualPath+'spGetMailFormData', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            //Generates PDF if exists URL
+            if(req.query.moduleReportURL){
+                logToFile("Generate PDF:  " + req.originalUrl)
+                logToFile("Generate PDF as :  " + req.query.uid)
+                
+                //Config Request
+                const agent = new https.Agent({ rejectUnauthorized: false });
+                const options = {
+                    url: req.query.moduleReportURL //url: 'https://localhost/ReportServer?/mktPO_1&rs:format=PDF&sys_user_code=1&sys_user_language=es&sys_user_company=1&row_id=5'
+                    ,followRedirect: true
+                    ,followAllRedirects: true
+                    ,jar: true
+                    ,agent: agent
+                    ,strictSSL: false
+                };
+                request(options).on('error', function(err) {
+                    logToFile("Error:  " + JSON.stringify(err))
+                    res.status(400).send(err);
+                    return;
+                }).pipe(fs.createWriteStream((process.env.tempFilesPath + req.query.uid + '.pdf')))
+            }
+            
+              
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(25), req.query.userLanguage )
+            .input('moduleName', sql.VarChar(500), req.query.moduleName )
+            .input('row_id', sql.Int, req.query.row_id )
+            .execute('spGetMailFormData', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spGetMailFormData:  " + ((new Date() - start) / 1000) + ' secs')
+                if(err){
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                //Push Attachment to Result (Using Public Internet Path to Temp Files)
+                if(req.query.moduleReportURL){
+                    let attachments = [{
+                         fileName: req.query.moduleName+'_'+req.query.row_id+'.pdf'
+                        ,uploadFilename: req.query.uid + '.pdf'
+                    }]
+                    result.recordset[0].attachments = attachments
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'sendUserMail', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                let transporter = nodemailer.createTransport({
+                    host: process.env.notifyMailHost,
+                    port: process.env.notifyMailPort,
+                    secure: process.env.notifyMailSecure,
+                    auth: {
+                      user: process.env.notifyMailUser,
+                      pass: process.env.notifyMailPass,
+                    },
+                    tls: {
+                        rejectUnauthorized: false// do not fail on invalid certs
+                    },
+                });
+                //convert Attachments
+                let attachments = []
+                if(req.body.attachments){
+                    JSON.parse(req.body.attachments).map(x=>
+                        attachments.push({
+                             filename: x.fileName
+                            ,path: process.env.tempFilesPath + x.uploadFilename
+                        })
+                    )
+                }
+                var mailOptions = {
+                    from: '"'+req.body.senderName+'" <'+process.env.notifyMailUser+'>', //from debe contener entre <> la misma cuenta que se usa en el Transporter (podría sacarla de [auth.user] )
+                    replyTo: req.body.senderMail,
+                    to: req.body.destinations,
+                    subject: req.body.subjectText,
+                    text: req.body.bodyText,
+                    html: req.body.bodyText,
+                    attachments: attachments
+                };
+
+                logToFile("Sending Mail...")
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        logToFile("Error sending mail")
+                        logToFile(error)
+                        res.status(400).send(error);
+                        return;
+                    }
+                    //logToFile("Message Message: " + info.messageId)
+                    logToFile("Message Sent: " + JSON.stringify(info) )
+                    logToFile("Perf spGetMailFormData:  " + ((new Date() - start) / 1000) + ' secs')
+                    res.status(200).send(info);
+                });
             }catch(ex){
                 logToFile("Service Error")
                 logToFile(ex)
