@@ -10,7 +10,7 @@ var request = require('request');                       //yarn add request --sav
 //var superagent = require('superagent');               //yarn add superagent --save
 var WebSocket  = require("ws");                         //yarn add ws --save
 var nodemailer = require("nodemailer");                 //yarn add nodemailer --save
-//var emlFormat = require("eml-format");                //yarn add eml-format --save
+var emlFormat = require("eml-format");                //yarn add eml-format --save
 //var socketIO = require("socket.io");                  //yarn add socket.io --save
 //var url = require('url');
 //var http = require('http');
@@ -335,7 +335,19 @@ app.get(process.env.iisVirtualPath+'downloadTempFile', veryfyToken, function(req
         }else{
             logToFile("Request:  " + req.originalUrl)
             logToFile("Perf downloadFile:  " + ((new Date() - start) / 1000) + ' secs' )
-            res.download((process.env.tempFilesPath + "//" + req.query.fileName))
+            res.download((process.env.tempFilesPath + "//" + req.query.fileName), function (err) {
+                if (err) {
+                    logToFile("Error downloading File...")
+                } else {
+                    logToFile("Deleting File: " + process.env.tempFilesPath + req.query.fileName);
+                    fs.unlink(process.env.tempFilesPath + req.query.fileName, (err) => {
+                        if (err) {
+                            logToFile("Deleting File error: " + process.env.tempFilesPath + req.query.fileName);
+                        }
+                    });
+                    logToFile("Temp file deleted")
+                }
+            })
         }
     })
 })
@@ -486,9 +498,85 @@ app.post(process.env.iisVirtualPath+'sendUserMail', veryfyToken, function(req, r
                         return;
                     }
                     //logToFile("Message Message: " + info.messageId)
+                    
                     logToFile("Message Sent: " + JSON.stringify(info) )
+                    if(req.body.attachments){
+                        JSON.parse(req.body.attachments).map(x=>{
+                            logToFile("Deleting File: " + process.env.tempFilesPath + x.uploadFilename);
+                            fs.unlink(process.env.tempFilesPath + x.uploadFilename, (err) => {
+                                if (err) {
+                                    logToFile("Deleting File error: " + process.env.tempFilesPath + x.uploadFilename);
+                                }
+                            });
+                        })
+                    }
                     logToFile("Perf spGetMailFormData:  " + ((new Date() - start) / 1000) + ' secs')
                     res.status(200).send(info);
+                });
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'generateEMLMail', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                let attachments = []
+                if(req.body.attachments){
+                    JSON.parse(req.body.attachments).map(x=>
+                        attachments.push({
+                             name: x.fileName
+                            ,data: fs.readFileSync(process.env.tempFilesPath + x.uploadFilename),
+                            //,path: process.env.tempFilesPath + x.uploadFilename
+                        })
+                    )
+                }
+                let destinations = [];
+                if(req.body.destinations&&req.body.destinations){
+                    req.body.destinations.replace(';',',')
+                    req.body.destinations.split(',').map(x=>{
+                        destinations.push({
+                            //name: '"'+x+'"', 
+                            email: x
+                        });
+                    });
+                }
+                if(destinations.length<=0){
+                    destinations = [{name: req.body.senderMail, email: req.body.senderMail}]
+                }
+                var data = {
+                    from: req.body.senderMail,
+                    headers: { "X-Unsent": "1"},
+                    to: destinations,
+                    subject: req.body.subjectText,
+                    html: req.body.bodyText,
+                    attachments: attachments
+                };
+                logToFile("Generating EML: " + process.env.tempFilesPath + req.body.uid + '.eml');
+                emlFormat.build(data, function(error, eml) {
+                    if(error){
+                        logToFile("Generating EML Error")
+                        logToFile(error)
+                        res.status(400).send(error);
+                        return;
+                    }
+                    fs.writeFileSync(process.env.tempFilesPath + req.body.uid + '.eml', eml);
+                    logToFile("EML File created: " + process.env.tempFilesPath + req.body.uid + '.eml')
+                    let resultado = {
+                        fileName: 'Mail.eml',
+                        uploadFilename: req.body.uid + '.eml'
+                    }
+                    res.status(200).send(resultado);
                 });
             }catch(ex){
                 logToFile("Service Error")
