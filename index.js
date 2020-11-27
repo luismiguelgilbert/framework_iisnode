@@ -366,7 +366,8 @@ app.post(process.env.iisVirtualPath+'spAttachGenerateID', veryfyToken, function(
                 .input('original_file_name', sql.VarChar(500), req.body.original_file_name )
                 .input('file_type', sql.VarChar(sql.MAX), req.body.file_type )
                 .input('file_size', sql.VarChar(sql.Int), req.body.file_size )
-                .input('row_id', sql.Int, req.body.row_id )
+                //.input('row_id', sql.Int, req.body.row_id )
+                .input('moduleName', sql.VarChar(500), req.body.moduleName )
                 .execute('spAttachGenerateID', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Perf spAttachGenerateID:  " + ((new Date() - start) / 1000) + ' secs' )
