@@ -3180,6 +3180,38 @@ app.post(process.env.iisVirtualPath+'spAccPaymentMethodsUpdate', veryfyToken, fu
 })
 //#endregion accPaymentMethods
 
+//#region AccvoucherOutSelectEdit
+app.get(process.env.iisVirtualPath+'spAccvoucherOutSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spAccvoucherOutSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spAccvoucherOutSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+//#endregion AccvoucherOutSelectEdit
+
 //#endregion Version_1_0_0
 
 
@@ -4110,6 +4142,7 @@ app.post(process.env.iisVirtualPath+'spSchFormacionesUpdate', veryfyToken, funct
 const server = app.listen(process.env.PORT);
 logToFile('API started using port ' + process.env.PORT)
 
+/*
 //#region WebSocket
 function addWebsocketConnection(newConnection){
     try{
@@ -4172,3 +4205,4 @@ WebSocketServer.on('connection', (ws,request) => {
     })
 })
 //#endregion WebSocket
+*/
