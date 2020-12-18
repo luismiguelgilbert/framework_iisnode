@@ -118,6 +118,7 @@ app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
     .input('sys_user_password', sql.VarChar(100), req.body.sys_user_password )
     .execute('spSysLogin', (err, result) => {
         logToFile("Request:  " + req.originalUrl)
+        //NO quiero grabar la clave logToFile("Request:  " + JSON.stringify(req.body))
         logToFile("Perf spSysLogin:  " + ((new Date() - start) / 1000) + ' secs' )
         if(err){
             if(err&&err.originalError&&err.originalError.info){
@@ -268,16 +269,16 @@ app.post(process.env.iisVirtualPath+'uploadFile', veryfyToken, function(req, res
             res.status(403).send(jwtError);
         }else{
             try{
-                logToFile('flag00')
+                //logToFile('flag00')
                 /*if (!req.files){
                     logToFile('Error en uploadFile (no se recibió archivo)')
                     res.status(400).send('Error en uploadFile (no se recibió archivo)');
                     return;
                 }*/
                 var fileName = Object.keys(req.files)[0]
-                logToFile('flag01')
+                //logToFile('flag01')
                 let sampleFile = req.files[fileName]
-                logToFile('flag02')
+                //logToFile('flag02')
                 logToFile('Upload ' + process.env.filesPath + req.query.upload_file_name)
                 sampleFile.mv(process.env.filesPath + req.query.upload_file_name, function(err) {
                     if(err){
@@ -370,6 +371,7 @@ app.post(process.env.iisVirtualPath+'spAttachGenerateID', veryfyToken, function(
                 .input('moduleName', sql.VarChar(500), req.body.moduleName )
                 .execute('spAttachGenerateID', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spAttachGenerateID:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -741,6 +743,7 @@ app.post(process.env.iisVirtualPath+'spSysModulesColumnsUserUpdate', veryfyToken
                 .input('columns', sql.VarChar(sql.MAX), req.body.columns )
                 .execute('spSysModulesColumnsUserUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysModulesColumnsUserUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -778,6 +781,7 @@ app.post(process.env.iisVirtualPath+'spSysModulesFiltersUserUpdate', veryfyToken
                 .input('conditions', sql.VarChar(sql.MAX), req.body.conditions )
                 .execute('spSysModulesFiltersUserUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysModulesFiltersUserUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -813,6 +817,7 @@ app.post(process.env.iisVirtualPath+'spSysModulesFiltersUserDelete', veryfyToken
                 .input('filter_id', sql.Int, req.body.filter_id )
                 .execute('spSysModulesFiltersUserDelete', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysModulesFiltersUserDelete:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -848,41 +853,7 @@ app.post(process.env.iisVirtualPath+'spSysModulesFiltersUserDefaultUpdate', very
                 .input('filter_id', sql.Int, req.body.filter_id )
                 .execute('spSysModulesFiltersUserDefaultUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
-                    logToFile("Perf spSysModulesFiltersUserDefaultUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
-
-                    if(err){
-                        logToFile("DB Error:  " + err.procName)
-                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
-                        res.status(400).send(err.originalError);
-                        return;
-                    }
-                    res.setHeader('content-type', 'application/json');
-                    res.status(200).send(result.recordset);
-                })
-            }catch(ex){
-                logToFile("Service Error")
-                logToFile(ex)
-                res.status(400).send(ex);
-                return;
-            }
-        }
-    })
-})
-app.post(process.env.iisVirtualPath+'spSysModulesFiltersUserDefaultUpdate', veryfyToken, function(req, res) {
-    let start = new Date()
-    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
-        if(jwtError){
-            logToFile("JWT Error:")
-            logToFile(jwtError)
-            res.status(403).send(jwtError);
-        }else{
-            try{
-                new sql.Request(connectionPool)
-                .input('link_name', sql.VarChar(50), req.body.link_name )
-                .input('sys_user_code', sql.Int, req.body.sys_user_code )
-                .input('filter_id', sql.Int, req.body.filter_id )
-                .execute('spSysModulesFiltersUserDefaultUpdate', (err, result) => {
-                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysModulesFiltersUserDefaultUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -950,6 +921,7 @@ app.post(process.env.iisVirtualPath+'spSysUsersUpdate', veryfyToken, function(re
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysUsersUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysUsersUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -984,6 +956,7 @@ app.post(process.env.iisVirtualPath+'spSysUsersPreferencesUpdate', veryfyToken, 
                 .input('user_data', sql.VarChar(sql.MAX), req.body.user_data )
                 .execute('spSysUsersPreferencesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysUsersPreferencesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1021,6 +994,7 @@ app.post(process.env.iisVirtualPath+'sp_sys_user_picture_upload', veryfyToken, f
                 .input('editing_sys_user_code', sql.VarChar(sql.Int), req.body.editing_sys_user_code )
                 .execute('sp_sys_user_picture_upload', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    //NO quiero registrar la imagen logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf sp_sys_user_picture_upload:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1088,6 +1062,7 @@ app.post(process.env.iisVirtualPath+'spSysProfilesUpdate', veryfyToken, function
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysProfilesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysProfilesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1155,6 +1130,7 @@ app.post(process.env.iisVirtualPath+'spSysCompaniesUpdate', veryfyToken, functio
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysCompaniesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysCompaniesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1222,6 +1198,7 @@ app.post(process.env.iisVirtualPath+'spSysModulesUpdate', veryfyToken, function(
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysModulesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysModulesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1290,6 +1267,7 @@ app.post(process.env.iisVirtualPath+'spNotificationsUpdate', veryfyToken, functi
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spNotificationsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spNotificationsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1358,6 +1336,7 @@ app.post(process.env.iisVirtualPath+'spAccAccountsUpdate', veryfyToken, function
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccAccountsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spAccAccountsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1426,6 +1405,7 @@ app.post(process.env.iisVirtualPath+'spSysTaxesUpdate', veryfyToken, function(re
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysTaxesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysTaxesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1494,6 +1474,7 @@ app.post(process.env.iisVirtualPath+'spAccTaxesUpdate', veryfyToken, function(re
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccTaxesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spAccTaxesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1562,6 +1543,7 @@ app.post(process.env.iisVirtualPath+'spAccPeriodsUpdate', veryfyToken, function(
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccPeriodsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spAccPeriodsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1630,6 +1612,7 @@ app.post(process.env.iisVirtualPath+'spAccPaytermsUpdate', veryfyToken, function
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccPaytermsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spAccPaytermsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1698,6 +1681,7 @@ app.post(process.env.iisVirtualPath+'spSysCompLocUpdate', veryfyToken, function(
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysCompLocUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSysCompLocUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1766,6 +1750,7 @@ app.post(process.env.iisVirtualPath+'spPartnerMasterUpdate', veryfyToken, functi
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spPartnerMasterUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spPartnerMasterUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1834,6 +1819,7 @@ app.post(process.env.iisVirtualPath+'spPartnerMasterGroupsUpdate', veryfyToken, 
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spPartnerMasterGroupsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spPartnerMasterGroupsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1902,6 +1888,7 @@ app.post(process.env.iisVirtualPath+'spInvMasterUpdate', veryfyToken, function(r
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvMasterUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spInvMasterUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -1970,6 +1957,7 @@ app.post(process.env.iisVirtualPath+'spInvMasterGroupsUpdate', veryfyToken, func
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvMasterGroupsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spInvMasterGroupsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2038,6 +2026,7 @@ app.post(process.env.iisVirtualPath+'spWhMasterUpdate', veryfyToken, function(re
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spWhMasterUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spWhMasterUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2106,6 +2095,7 @@ app.post(process.env.iisVirtualPath+'spInvMasterUoMUpdate', veryfyToken, functio
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvMasterUoMUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spInvMasterUoMUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2174,6 +2164,7 @@ app.post(process.env.iisVirtualPath+'spInvMasterBrandsUpdate', veryfyToken, func
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvMasterBrandsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spInvMasterBrandsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2315,6 +2306,7 @@ app.post(process.env.iisVirtualPath+'spMktPRUpdate', veryfyToken, function(req, 
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spMktPRUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spMktPRUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2412,6 +2404,7 @@ app.post(process.env.iisVirtualPath+'spMktPOUpdate', veryfyToken, function(req, 
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spMktPOUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spMktPOUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2509,6 +2502,7 @@ app.post(process.env.iisVirtualPath+'spMktPORetUpdate', veryfyToken, function(re
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spMktPORetUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spMktPORetUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2608,6 +2602,7 @@ app.post(process.env.iisVirtualPath+'spInvKardexIncomingUpdate', veryfyToken, fu
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvKardexIncomingUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spInvKardexIncomingUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2676,6 +2671,7 @@ app.post(process.env.iisVirtualPath+'spInvKardexOutgoingUpdate', veryfyToken, fu
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvKardexOutgoingUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spInvKardexOutgoingUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2865,6 +2861,7 @@ app.post(process.env.iisVirtualPath+'spAccMovesUpdate', veryfyToken, function(re
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccMovesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spAccMovesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -2993,6 +2990,7 @@ app.post(process.env.iisVirtualPath+'spAccAPUpdate', veryfyToken, function(req, 
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccAPUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spAccAPUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3158,6 +3156,7 @@ app.post(process.env.iisVirtualPath+'spAccPaymentMethodsUpdate', veryfyToken, fu
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccPaymentMethodsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spAccPaymentMethodsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3226,6 +3225,7 @@ app.post(process.env.iisVirtualPath+'spAccvoucherOutUpdate', veryfyToken, functi
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccvoucherOutUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spAccvoucherOutUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3327,6 +3327,7 @@ app.post(process.env.iisVirtualPath+'spCasCasesTypesUpdate', veryfyToken, functi
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasCasesTypesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spCasCasesTypesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3395,6 +3396,7 @@ app.post(process.env.iisVirtualPath+'spCasTasksTypesUpdate', veryfyToken, functi
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasTasksTypesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spCasTasksTypesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3463,6 +3465,7 @@ app.post(process.env.iisVirtualPath+'spCasLocationsUpdate', veryfyToken, functio
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasLocationsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spCasLocationsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3531,6 +3534,7 @@ app.post(process.env.iisVirtualPath+'spCasClientesUpdate', veryfyToken, function
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasClientesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spCasClientesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3599,6 +3603,7 @@ app.post(process.env.iisVirtualPath+'spCasContratosUpdate', veryfyToken, functio
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasContratosUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spCasContratosUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3667,6 +3672,7 @@ app.post(process.env.iisVirtualPath+'spCasCasesUpdate', veryfyToken, function(re
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasCasesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spCasCasesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3735,6 +3741,7 @@ app.post(process.env.iisVirtualPath+'spCasCasesTasksUpdate', veryfyToken, functi
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasCasesTasksUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spCasCasesTasksUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3803,6 +3810,7 @@ app.post(process.env.iisVirtualPath+'spCasInvoicesUpdate', veryfyToken, function
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasInvoicesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spCasInvoicesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3906,6 +3914,7 @@ app.post(process.env.iisVirtualPath+'spSchPersonasUpdate', veryfyToken, function
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchPersonasUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSchPersonasUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -3974,6 +3983,7 @@ app.post(process.env.iisVirtualPath+'spSchGroupsUpdate', veryfyToken, function(r
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchGroupsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSchGroupsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -4042,6 +4052,7 @@ app.post(process.env.iisVirtualPath+'spSchSectoresUpdate', veryfyToken, function
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchSectoresUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSchSectoresUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -4110,6 +4121,7 @@ app.post(process.env.iisVirtualPath+'spSchApostoladosUpdate', veryfyToken, funct
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchApostoladosUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSchApostoladosUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
@@ -4178,6 +4190,7 @@ app.post(process.env.iisVirtualPath+'spSchFormacionesUpdate', veryfyToken, funct
                 .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchFormacionesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
                     logToFile("Perf spSchFormacionesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
 
                     if(err){
