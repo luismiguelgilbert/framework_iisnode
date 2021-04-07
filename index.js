@@ -5830,6 +5830,348 @@ app.post(process.env.iisVirtualPath+'spBitaridesUpdate', veryfyToken, function(r
 })
 //#endregion
 
+//#region ENS
+
+//#region ENS_PERSONAS
+app.get(process.env.iisVirtualPath+'spEnsPersonasSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spEnsPersonasSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spEnsPersonasSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spEnsPersonasUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spEnsPersonasUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
+                    logToFile("Perf spEnsPersonasUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.get(process.env.iisVirtualPath+'spEnsPersonaSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spEnsPersonaSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spEnsPersonaSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+//#endregion ENS_PERSONAS
+
+//#region ENS_TEAMS
+app.get(process.env.iisVirtualPath+'spEnsTeamsSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spEnsTeamsSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spEnsTeamsSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spEnsTeamsUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spEnsTeamsUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
+                    logToFile("Perf spEnsTeamsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion ENS_TEAMS
+
+//#region ENS_SERVICIOS
+app.get(process.env.iisVirtualPath+'spEnsServiciosSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spEnsServiciosSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spEnsServiciosSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spEnsServiciosUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spEnsServiciosUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
+                    logToFile("Perf spEnsServiciosUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion ENS_SERVICIOS
+
+//#region ENS_LIBROS
+app.get(process.env.iisVirtualPath+'spEnsLibrosSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spEnsLibrosSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spEnsLibrosSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spEnsLibrosUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spEnsLibrosUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
+                    logToFile("Perf spEnsLibrosUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion ENS_LIBROS
+
+//#region ENS_JOBSEARCH
+app.get(process.env.iisVirtualPath+'spEnsJobSearch', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('searchString', sql.VarChar(sql.MAX), req.query.searchString )
+            .execute('spEnsJobSearch', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spEnsJobSearch:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+//#endregion ENS_JOBSEARCH
+
+//#endregion ENS
+
+
+
 const server = app.listen(process.env.PORT);
 logToFile('API started using port ' + process.env.PORT)
 
