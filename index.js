@@ -982,6 +982,42 @@ app.get(process.env.iisVirtualPath+'generatePDFandDOWNLOAD', veryfyToken, functi
         }
     })
 })
+app.post(process.env.iisVirtualPath+'spSysTokensMobileUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('@token', sql.VarChar(sql.MAX), req.body.token )
+                .input('@deviceData', sql.VarChar(sql.MAX), req.body.deviceData )
+                .execute('spSysTokensMobileUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
+                    logToFile("Perf spSysTokensMobileUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
 //#endregion SESSION_OTHERS
 
 //#region DynamicData
