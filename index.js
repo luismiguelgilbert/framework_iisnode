@@ -993,8 +993,8 @@ app.post(process.env.iisVirtualPath+'spSysTokensMobileUpdate', veryfyToken, func
             try{
                 new sql.Request(connectionPool)
                 .input('userCode', sql.Int, req.body.userCode )
-                .input('@token', sql.VarChar(sql.MAX), req.body.token )
-                .input('@deviceData', sql.VarChar(sql.MAX), req.body.deviceData )
+                .input('token', sql.VarChar(sql.MAX), req.body.token )
+                .input('deviceData', sql.VarChar(sql.MAX), req.body.deviceData )
                 .execute('spSysTokensMobileUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
