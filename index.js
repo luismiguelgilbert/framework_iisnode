@@ -5,6 +5,7 @@ var express = require('express');                       //yarn add express -- sa
 var sql = require('mssql');                             //yarn add mssql -- save
 var jwt = require("jsonwebtoken");                      //yarn add jsonwebtoken --save
 var request = require('request');                       //yarn add request --save
+var httpntlm = require('httpntlm');                 //yarn add httpntlm
 //var axios = require('axios');                         //yarn add axios --save
 //var curl = require('curl');                           //yarn add curl --save
 //var superagent = require('superagent');               //yarn add superagent --save
@@ -141,11 +142,27 @@ app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
                     res.status(400).send(err);
                     return;
                 }else{
-                    logToFile('Welcome: ' + req.body.sys_user_id)
-                    userToken = token
-                    result.recordset[0].jwtToken = token
-                    res.setHeader('content-type', 'application/json');
-                    res.status(200).send(result.recordset);
+                    new sql.Request(connectionPool)
+                    .input('sys_user_code', sql.Int, result.recordset[0].sys_user_code)
+                    .input('token', sql.VarChar(sql.MAX), token)
+                    .input('device_data', sql.VarChar(sql.MAX), null)//se puede agregar información adicional
+                    .execute('spSysLoginLogToken', (errA, resultA) => {
+                        if(errA){
+                            if(errA&&errA.originalError&&errA.originalError.info){
+                                logToFile('DB Error: ' + JSON.stringify(errA.originalError.info))
+                            }else{
+                                logToFile('DB Error: ' + JSON.stringify(errA.originalError))
+                            }
+                            res.status(400).send(errA.originalError);
+                            return;
+                        }
+                        
+                        logToFile('Welcome: ' + req.body.sys_user_id)
+                        userToken = token
+                        result.recordset[0].jwtToken = token
+                        res.setHeader('content-type', 'application/json');
+                        res.status(200).send(result.recordset);
+                    })
                 }
             })
         }else{
@@ -970,8 +987,8 @@ app.get(process.env.iisVirtualPath+'generatePDFandDOWNLOAD', veryfyToken, functi
                 }).pipe(fs.createWriteStream((process.env.tempFilesPath + req.query.fileName )))
 
                 //create attachments variable AFTER file is created (stream finished)
-                
                 stream.on('finish', function (){
+                    logToFile("Creado finish:  " + process.env.tempFilesPath + req.query.fileName )
                     res.download(process.env.tempFilesPath + req.query.fileName)
                 })
             }catch(ex){
@@ -1019,6 +1036,283 @@ app.post(process.env.iisVirtualPath+'spSysTokensMobileUpdate', veryfyToken, func
         }
     })
 })
+app.get(process.env.iisVirtualPath+'pbirsGetPDF', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                //Login to PBIRS and Create PDF file based on parameters
+                logToFile("pbirsGetPDF: " + req.query.reportURL)
+                httpntlm.get(
+                    {
+                        url: req.query.reportURL,
+                        username: process.env.rptUser,
+                        password: process.env.rptPwd,
+                        workstation: 'localhost',
+                        domain: '',
+                        binary: true,
+                        strictSSL: false,
+                        rejectUnauthorized: false
+                    }, function (err, response){
+                        if(err){
+                            logToFile("error getting pbirs file !!!!!!!!!!!!!!!!!");
+                            logToFile(err);
+                            res.status(400).send(ex);
+                            return;
+                        }
+                        //Creo Archivo
+                        fs.writeFile(
+                            (process.env.tempFilesPath + req.query.pdfName)
+                            ,response.body
+                            ,function (error2) {
+                                if(error2){
+                                    logToFile("Error creating pbirs pdf file:");
+                                    res.status(400).send(error2);
+                                    return;
+                                }
+                                res.download(process.env.tempFilesPath + req.query.pdfName)
+                            }
+                        )
+                    }
+                )
+
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'pbirsGetEML', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                //Login to PBIRS and Create PDF file based on parameters
+                logToFile("pbirsGetEML: " + req.body.mailReportURL)
+                httpntlm.get(
+                    {
+                        url: req.body.mailReportURL,
+                        username: process.env.rptUser,
+                        password: process.env.rptPwd,
+                        workstation: 'localhost',
+                        domain: '',
+                        binary: true,
+                        strictSSL: false,
+                        rejectUnauthorized: false
+                    }, function (err, response){
+                        if(err){
+                            logToFile("error getting pbirs_eml file !!!!!!!!!!!!!!!!!");
+                            logToFile(err);
+                            res.status(400).send(ex);
+                            return;
+                        }
+                        //Creo Archivo PDF
+                        fs.writeFile(
+                            (process.env.tempFilesPath + req.body.rptName)
+                            ,response.body
+                            ,function (error2) {
+                                if(error2){
+                                    logToFile("Error creating pbirs pdf file:");
+                                    res.status(400).send(error2);
+                                    return;
+                                }
+                                logToFile("pbirs pdf file created: " + process.env.tempFilesPath + req.body.rptName);
+                                
+                                //Read attachments
+                                let attachments = []
+                                let fileData = null;
+                                fileData = fs.readFileSync(process.env.tempFilesPath + req.body.rptName);
+                                attachments.push({
+                                    name: req.body.rptName,
+                                    data: fileData,
+                                })
+                                //fix data for EML generation
+                                let destinations = []
+                                req.body.destinations.map(x=>{
+                                    destinations.push({
+                                        //name: x.contactName,
+                                        email: x.mail
+                                    })
+                                })
+                                if(destinations.length<=0){
+                                    destinations = [{name: req.body.senderMail, email: req.body.senderMail}]
+                                }
+                                var data = {
+                                    from: req.body.senderMail,
+                                    headers: { "X-Unsent": "1"},
+                                    to: destinations,
+                                    subject: req.body.subjectText,
+                                    html: req.body.bodyText,
+                                    attachments: attachments
+                                };
+                                //delete PDF
+                                fs.unlink(process.env.tempFilesPath + req.body.rptName, (err) => {
+                                    if (err) {
+                                        logToFile("Deleting File error: " + process.env.tempFilesPath + req.body.rptName);
+                                    }
+                                    logToFile("File deleted: " + process.env.tempFilesPath + req.body.rptName);
+                                });
+                                //Generate EML
+                                logToFile("Generating EML: " + process.env.tempFilesPath + req.body.uid + '.eml');
+                                emlFormat.build(data, function(error, eml) {
+                                    if(error){
+                                        logToFile("Generating EML Error")
+                                        logToFile(error)
+                                        res.status(400).send(error);
+                                        return;
+                                    }
+                                    fs.writeFileSync(process.env.tempFilesPath + req.body.uid + '.eml', eml);
+                                    logToFile("EML File created: " + process.env.tempFilesPath + req.body.uid + '.eml')
+                                    let resultado = {
+                                        fileName: 'Mail.eml',
+                                        uploadFilename: req.body.uid + '.eml'
+                                    }
+                                    res.status(200).send(resultado);
+                                });
+
+                            }
+                        )
+                        
+
+                      
+                    }
+                )
+
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'pbirsSendMail', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                //Login to PBIRS and Create PDF file based on parameters
+                logToFile("pbirsSendMail: " + req.body.mailReportURL)
+                httpntlm.get(
+                    {
+                        url: req.body.mailReportURL,
+                        username: process.env.rptUser,
+                        password: process.env.rptPwd,
+                        workstation: 'localhost',
+                        domain: '',
+                        binary: true,
+                        strictSSL: false,
+                        rejectUnauthorized: false
+                    }, function (err, response){
+                        if(err){
+                            logToFile("error getting pbirs_eml file !!!!!!!!!!!!!!!!!");
+                            logToFile(err);
+                            res.status(400).send(ex);
+                            return;
+                        }
+                        //Creo Archivo PDF
+                        fs.writeFile(
+                            (process.env.tempFilesPath + req.body.rptName)
+                            ,response.body
+                            ,function (error2) {
+                                if(error2){
+                                    logToFile("Error creating pbirs pdf file:");
+                                    res.status(400).send(error2);
+                                    return;
+                                }
+                                logToFile("pbirs pdf file created: " + process.env.tempFilesPath + req.body.rptName);
+                                
+                                //Read attachments
+                                let attachments = []
+                                attachments.push({
+                                    filename: req.body.rptName
+                                    ,path: process.env.tempFilesPath + req.body.rptName
+                                })
+                                //fix data for MAIL
+                                var mailOptions = {
+                                    from: '"'+req.body.senderName+'" <'+process.env.notifyMailUser+'>', //from debe contener entre <> la misma cuenta que se usa en el Transporter (podría sacarla de [auth.user] )
+                                    replyTo: req.body.senderMail,
+                                    to: req.body.destinations.map(x=>x.mail).join(", "),
+                                    subject: req.body.subjectText,
+                                    text: req.body.bodyText,
+                                    html: req.body.bodyText,
+                                    attachments: attachments
+                                };
+
+                                //create Transporter
+                                let transporter = nodemailer.createTransport({
+                                    host: process.env.notifyMailHost,
+                                    port: process.env.notifyMailPort,
+                                    secure: process.env.notifyMailSecure,
+                                    auth: {
+                                        user: process.env.notifyMailUser,
+                                        pass: process.env.notifyMailPass,
+                                    },
+                                    tls: {
+                                        rejectUnauthorized: false// do not fail on invalid certs
+                                    },
+                                });
+
+                                //SendMail
+                                logToFile("Sending Mail...")
+                                logToFile("mailOptions: " + JSON.stringify(mailOptions));
+                                transporter.sendMail(mailOptions, (error, info) => {
+                                    if (error) {
+                                        logToFile("Error sending mail")
+                                        logToFile(error)
+                                        logToFile("Deleting Sending Mail File: " + process.env.tempFilesPath + req.body.rptName);
+                                        fs.unlink(process.env.tempFilesPath + req.body.rptName, (err) => {
+                                            if (err) {
+                                                logToFile("Deleting File error: " + process.env.tempFilesPath + req.body.rptName);
+                                            }
+                                        });
+                                        res.status(400).send(error);
+                                        return;
+                                    }
+                                    //logToFile("Message Message: " + info.messageId)
+                                    
+                                    logToFile("Message Sent: " + JSON.stringify(info) )
+                                    logToFile("Deleting Sending Mail File: " + process.env.tempFilesPath + req.body.rptName);
+                                    fs.unlink(process.env.tempFilesPath + req.body.rptName, (err) => {
+                                        if (err) {
+                                            logToFile("Deleting File error: " + process.env.tempFilesPath + req.body.rptName);
+                                        }
+                                    });
+                                    logToFile("Perf spGetMailFormData:  " + ((new Date() - start) / 1000) + ' secs')
+                                    res.status(200).send(info);
+                                });
+                            }
+                        )
+                    }
+                )
+
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+
+
 //#endregion SESSION_OTHERS
 
 //#region DynamicData
@@ -1045,6 +1339,70 @@ app.get(process.env.iisVirtualPath+'spSysModulesSelect', veryfyToken, function(r
                 res.setHeader('content-type', 'application/json');
                 res.status(200).send(result.recordset);
             })
+        }
+    })
+})
+app.get(process.env.iisVirtualPath+'spSysReportsSelect', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userLanguage', sql.VarChar(25), req.query.userLanguage )
+            .input('rootName', sql.VarChar(100), req.query.rootName )
+            .execute('spSysReportsSelect', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spSysReportsSelect:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spSysReportsUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('sys_report_id', sql.VarChar(10), req.body.sys_report_id )
+                .input('newAutoOpenState', sql.Bit, req.body.newAutoOpenState )
+                .execute('spSysReportsUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
+                    logToFile("Perf spSysReportsUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
         }
     })
 })

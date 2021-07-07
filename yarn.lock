@@ -552,6 +552,19 @@ http-signature@~1.2.0:
     jsprim "^1.2.2"
     sshpk "^1.7.0"
 
+httpntlm@^1.7.7:
+  version "1.7.7"
+  resolved "https://registry.yarnpkg.com/httpntlm/-/httpntlm-1.7.7.tgz#51b914f18e5de2868d4bfe50aeecdb1db23218a1"
+  integrity sha512-Pv2Rvrz8H0qv1Dne5mAdZ9JegG1uc6Vu5lwLflIY6s8RKHdZQbW39L4dYswSgqMDT0pkJILUTKjeyU0VPNRZjA==
+  dependencies:
+    httpreq ">=0.4.22"
+    underscore "~1.12.1"
+
+httpreq@>=0.4.22:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/httpreq/-/httpreq-0.5.2.tgz#be6777292fa1038d7771d7c01d9a5e1219de951c"
+  integrity sha512-2Jm+x9WkExDOeFRrdBCBSpLPT5SokTcRHkunV3pjKmX/cx6av8zQ0WtHUMDrYb6O4hBFzNU6sxJEypvRUVYKnw==
+
 iconv-lite@0.4.24:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
@@ -1102,6 +1115,11 @@ type-is@~1.6.17, type-is@~1.6.18:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.11.0.tgz#dd7c23a195db34267186044649870ff1bab5929e"
   integrity sha512-xY96SsN3NA461qIRKZ/+qox37YXPtSBswMGfiNptr+wrt6ds4HaMw23TP612fEyGekRE6LNRiLYr/aqbHXNedw==
+
+underscore@~1.12.1:
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.12.1.tgz#7bb8cc9b3d397e201cf8553336d262544ead829e"
+  integrity sha512-hEQt0+ZLDVUMhebKxL4x1BTtDY7bavVofhZ9KZ4aI26X9SRaE+Y3m83XUL1UP2jn8ynjndwCCpEHdUG+9pP1Tw==
 
 unpipe@1.0.0, unpipe@~1.0.0:
   version "1.0.0"

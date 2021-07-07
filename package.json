@@ -4,6 +4,7 @@
     "eml-format": "^0.6.1",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
+    "httpntlm": "^1.7.7",
     "jsonwebtoken": "^8.5.1",
     "mssql": "^6.2.1",
     "nodemailer": "^6.4.15",
