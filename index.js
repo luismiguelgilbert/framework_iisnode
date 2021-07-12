@@ -6,7 +6,8 @@ var sql = require('mssql');                             //yarn add mssql -- save
 var jwt = require("jsonwebtoken");                      //yarn add jsonwebtoken --save
 var request = require('request');                       //yarn add request --save
 var httpntlm = require('httpntlm');                 //yarn add httpntlm
-//var axios = require('axios');                         //yarn add axios --save
+var axios = require('axios');                         //yarn add axios --save
+var soapRequest = require('easy-soap-request'); //yarn add easy-soap-request
 //var curl = require('curl');                           //yarn add curl --save
 //var superagent = require('superagent');               //yarn add superagent --save
 //var WebSocket  = require("ws");                         //yarn add ws --save
@@ -7083,8 +7084,49 @@ app.post(process.env.iisVirtualPath+'spEnsEventsUpdate', veryfyToken, function(r
 })
 //#endregion ENS_Calendar
 
-
-//#endregion ENS
+//#region SDE(Holcim)
+app.post(process.env.iisVirtualPath+'sde_GetTag_Out_Sync', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                const url = 'https://dev.laseritsconline.com:47489/XISOAPAdapter/MessageServlet?senderParty=PEGASUS_GUARDIA&senderService=EC_PEGASUS&receiverParty=&receiverService=CSQCLNT400&interface=GetTag_Out_Sync&interfaceNamespace=urn:com:lh:logistics:la:pegasus:guardia';
+                const sampleHeaders = {
+                    'user-agent': 'pegasus',
+                    'Content-Type': 'text/xml;charset=UTF-8',
+                    'soapAction': 'http://sap.com/xi/WebService/soap1.1',
+                    'Authorization': 'Basic cGVnYXN1czpMc3JAMjAxMw=='
+                };
+                const xmlRequest = req.body.xmlRequest
+                logToFile(req.body.xmlRequest)
+                soapRequest(
+                    { url: url, headers: sampleHeaders, xml: xmlRequest, timeout: 2000 }
+                ).then((respuesta)=>{
+                    const { response } = respuesta;
+                    const { headers, body, statusCode } = response;
+                    logToFile(JSON.stringify(headers))
+                    logToFile(body)
+                    logToFile(statusCode)
+                    res.status(statusCode).send(body);
+                }).catch((errorWS)=>{
+                    logToFile("errorWS")
+                    logToFile(errorWS)
+                    res.status(400).send(errorWS);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion SDE(Holcim)
 
 
 
