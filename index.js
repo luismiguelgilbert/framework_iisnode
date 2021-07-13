@@ -7094,6 +7094,7 @@ app.post(process.env.iisVirtualPath+'sde_GetTag_Out_Sync', veryfyToken, function
             res.status(403).send(jwtError);
         }else{
             try{
+                logToFile('running sde_GetTag_Out_Sync')
                 const url = 'https://dev.laseritsconline.com:47489/XISOAPAdapter/MessageServlet?senderParty=PEGASUS_GUARDIA&senderService=EC_PEGASUS&receiverParty=&receiverService=CSQCLNT400&interface=GetTag_Out_Sync&interfaceNamespace=urn:com:lh:logistics:la:pegasus:guardia';
                 const sampleHeaders = {
                     'user-agent': 'pegasus',
@@ -7102,6 +7103,50 @@ app.post(process.env.iisVirtualPath+'sde_GetTag_Out_Sync', veryfyToken, function
                     'Authorization': 'Basic cGVnYXN1czpMc3JAMjAxMw=='
                 };
                 const xmlRequest = req.body.xmlRequest
+                logToFile(req.body.xmlRequest)
+                soapRequest(
+                    { url: url, headers: sampleHeaders, xml: xmlRequest, timeout: 2000 }
+                ).then((respuesta)=>{
+                    const { response } = respuesta;
+                    const { headers, body, statusCode } = response;
+                    logToFile(JSON.stringify(headers))
+                    logToFile(body)
+                    logToFile(statusCode)
+                    res.status(statusCode).send(body);
+                }).catch((errorWS)=>{
+                    logToFile("errorWS")
+                    logToFile(errorWS)
+                    res.status(400).send(errorWS);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'sde_PlantTimesV03_Out_Sync', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                const url = 'https://dev.laseritsconline.com:47489/XISOAPAdapter/MessageServlet?senderParty=PEGASUS_PLANTA&senderService=EC_PEGASUS&receiverParty=&receiverService=&interface=PlantTimesV03_Out_Sync&interfaceNamespace=urn:com:lh:logistics:la:pegasus:planta';
+                const sampleHeaders = {
+                    'user-agent': 'pegasus',
+                    'Content-Type': 'text/xml;charset=UTF-8',
+                    'soapAction': 'http://sap.com/xi/WebService/soap1.1',
+                    'Authorization': 'Basic cGVnYXN1czpMc3JAMjAxMw=='
+                };
+                const xmlRequest = req.body.xmlRequest
+                //<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:com:lh:logistics:la:pegasus:planta"> <soapenv:Header/> <soapenv:Body> <urn:PlantTimesV03Request> <PAIS>EC</PAIS> <CENTRO>ACB0</CENTRO> <FECHA>2021-06-18</FECHA> <HORA>09:35:12</HORA> <IDANTENA>ACVIGIN</IDANTENA> <IDTAG>EGSI2736</IDTAG> <PESO></PESO> <PRECINTOS></PRECINTOS> <PESO_MANUAL></PESO_MANUAL> <PESO_TANDEM> <CAPAC></CAPAC> </PESO_TANDEM> <TKNUM>63401533</TKNUM> <PESO_TARA_1_PARC></PESO_TARA_1_PARC> <PESO_BRUTO_1_PARC></PESO_BRUTO_1_PARC> <PESO_TARA_2_PARC></PESO_TARA_2_PARC> <PESO_BRUTO_2_PARC></PESO_BRUTO_2_PARC> <VBELN>330101406</VBELN> <PRECINTOS_2></PRECINTOS_2> <PONTO_CARGA></PONTO_CARGA> <CONTINGENCIA></CONTINGENCIA> <T_DADOS_ENTREGA> <VBELN>330102016</VBELN> <REF_EXT>X1234</REF_EXT> </T_DADOS_ENTREGA> </urn:PlantTimesV03Request> </soapenv:Body> </soapenv:Envelope>
+                //const xmlRequest = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:com:lh:logistics:la:pegasus:planta"> <soapenv:Header/> <soapenv:Body> <urn:PlantTimesV03Request> <PAIS>EC</PAIS> <CENTRO>ACB0</CENTRO> <FECHA>2021-06-18</FECHA> <HORA>09:35:12</HORA> <IDANTENA>ACVIGIN</IDANTENA> <IDTAG>EGSI2736</IDTAG> <PESO></PESO> <PRECINTOS></PRECINTOS> <PESO_MANUAL></PESO_MANUAL> <PESO_TANDEM> <CAPAC></CAPAC> </PESO_TANDEM> <TKNUM>63401533</TKNUM> <PESO_TARA_1_PARC></PESO_TARA_1_PARC> <PESO_BRUTO_1_PARC></PESO_BRUTO_1_PARC> <PESO_TARA_2_PARC></PESO_TARA_2_PARC> <PESO_BRUTO_2_PARC></PESO_BRUTO_2_PARC> <VBELN>330101406</VBELN> <PRECINTOS_2></PRECINTOS_2> <PONTO_CARGA></PONTO_CARGA> <CONTINGENCIA></CONTINGENCIA> <T_DADOS_ENTREGA> <VBELN>330102016</VBELN> <REF_EXT>X1234</REF_EXT> </T_DADOS_ENTREGA> </urn:PlantTimesV03Request> </soapenv:Body> </soapenv:Envelope>'
+                logToFile('running sde_PlantTimesV03_Out_Sync')
                 logToFile(req.body.xmlRequest)
                 soapRequest(
                     { url: url, headers: sampleHeaders, xml: xmlRequest, timeout: 2000 }
