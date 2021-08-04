@@ -14,6 +14,7 @@ var soapRequest = require('easy-soap-request'); //yarn add easy-soap-request
 var nodemailer = require("nodemailer");                 //yarn add nodemailer --save
 var emlFormat = require("eml-format");                //yarn add eml-format --save
 //var socketIO = require("socket.io");                  //yarn add socket.io --save
+var ExcelJS = require('exceljs');             //yarn add exceljs --save
 //var url = require('url');
 //var http = require('http');
 var https = require('https');
@@ -7014,6 +7015,326 @@ app.post(process.env.iisVirtualPath+'spEnsWorkMeetUpdate', veryfyToken, function
     })
 })
 //#endregion ENS_MEET_WORK
+
+//#region REWARDS(Comisiones)
+app.get(process.env.iisVirtualPath+'spRewMasterSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spRewMasterSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spRewMasterSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.get(process.env.iisVirtualPath+'spRewMasterTableDataSelect', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('rewTableID', sql.Int, req.query.rewTableID )
+            .execute('spRewMasterTableDataSelect', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spRewMasterTableDataSelect:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spRewMasterUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .execute('spRewMasterUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
+                    logToFile("Perf spRewMasterUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.get(process.env.iisVirtualPath+'spRewMasterTableDataLookupDataSelect', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('rewTableID', sql.Int, req.query.rewTableID )
+            .input('fieldName', sql.VarChar(250), req.query.fieldName )
+            .execute('spRewMasterTableDataLookupDataSelect', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spRewMasterTableDataLookupDataSelect:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spRewMasterGetResults', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('rewTableID', sql.Int, req.body.rewTableID )
+                .input('rewMasterResults', sql.VarChar(sql.MAX), req.body.rewMasterResults )
+                .input('rewMasterResultsLines', sql.VarChar(sql.MAX), req.body.rewMasterResultsLines )
+                .input('selected', sql.VarChar(sql.MAX), req.body.selected )
+                .execute('spRewMasterGetResults', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Request:  " + JSON.stringify(req.body))
+                    logToFile("Perf spRewMasterGetResults:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spRewMasterGetResultsDetails', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                const workbook = new ExcelJS.Workbook();
+                //1.- Primero ejecuta stored_procedure [spRewMasterGetResults] y el resultado lo inserta en primera hoja
+                try{
+                    new sql.Request(connectionPool)
+                    .input('userCode', sql.Int, req.body.userCode )
+                    .input('userCompany', sql.Int, req.body.userCompany )
+                    .input('rewTableID', sql.Int, req.body.rewTableID )
+                    .input('rewMasterResults', sql.VarChar(sql.MAX), req.body.rewMasterResults )
+                    .input('rewMasterResultsLines', sql.VarChar(sql.MAX), req.body.rewMasterResultsLines )
+                    .input('selected', sql.VarChar(sql.MAX), req.body.selected )
+                    .execute('spRewMasterGetResults', (err, result) => {
+                        logToFile("Request:  " + req.originalUrl)
+                        logToFile("Request:  " + JSON.stringify(req.body))
+                        logToFile("Perf spRewMasterGetResults:  " + ((new Date() - start) / 1000) + ' secs' )
+                        start = new Date() //para calcular creación de página
+                        if(err){
+                            logToFile("DB Error:  " + err.procName)
+                            logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                            res.status(400).send(err.originalError);
+                            return;
+                        }
+                        logToFile("spRewMasterGetResults creando workSheetResumen")
+                        //Crear worksheet Resumen
+                        const workSheetResumen = workbook.addWorksheet('Resumen');
+                        //Freeze 1a fila
+                        workSheetResumen.views = [
+                            {state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'A2'}
+                        ];
+                        //Agrega Columnas
+                        if(result&&result.recordset&&result.recordset[0]){
+                            try{
+                                let columnas = [];
+                                Object.keys(result.recordset[0]).forEach(keyName => { columnas.push({header: keyName, key: keyName, width: 30}) });
+                                //logToFile(JSON.stringify(columnas))
+                                workSheetResumen.columns = columnas
+                            }catch(ex){
+                                logToFile('se produjo un error:')
+                                logToFile(ex)
+                                logToFile(ex.message)
+                                res.status(400).send(ex);
+                                return
+                            }
+                        }
+                        //Pone en negritas las celdas de la fila 1
+                        workSheetResumen.getRow(1).font = { bold: true };
+                        //Barre el contenido y lo agrega a la hoja de Resultados
+                        workSheetResumen.addRows(result.recordset);
+                        logToFile("spRewMasterGetResults workSheetResumen creado")
+                        logToFile("Perf workSheetResumen creado:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                      
+
+                        //2.- Ahora, Agrega la hoja de Datos
+                        logToFile("spRewMasterGetResults obteniendo detalles...")
+                        start = new Date() //para calcular creación de página
+                        try{
+                            new sql.Request(connectionPool)
+                            .input('userCode', sql.Int, req.body.userCode )
+                            .input('userCompany', sql.Int, req.body.userCompany )
+                            .input('rewTableID', sql.Int, req.body.rewTableID )
+                            .input('rewMasterResults', sql.VarChar(sql.MAX), req.body.rewMasterResults )
+                            .input('rewMasterResultsLines', sql.VarChar(sql.MAX), req.body.rewMasterResultsLines )
+                            .input('selected', sql.VarChar(sql.MAX), req.body.selected )
+                            .execute('spRewMasterGetResultsDetails', (errDetails, resultDetails) => {
+                                logToFile("Perf spRewMasterGetResultsDetails :  " + ((new Date() - start) / 1000) + ' secs' )
+                                if(errDetails){
+                                    if(errDetails&&errDetails.originalError&&errDetails.originalError.info){
+                                        logToFile('DB Error: ' + JSON.stringify(errDetails.originalError.info))
+                                    }else{
+                                        logToFile('DB Error: ' + JSON.stringify(errDetails.originalError))
+                                    }
+                                    res.status(400).send(errDetails.originalError);
+                                    return;
+                                }
+                                start = new Date() //para calcular creación de página
+                                logToFile("spRewMasterGetResults creando workSheetDetalles")
+                                //Crear worksheet Detalles
+                                const workSheetDetalles = workbook.addWorksheet('Detalles');
+                                //Freeze 1a fila
+                                workSheetDetalles.views = [
+                                    {state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'A2'}
+                                ];
+                                //Pone 1a Fila en Negritas
+                                workSheetDetalles.getRow(1).font = { bold: true };
+                                //Agrega Columnas
+                                if(resultDetails&&resultDetails.recordset&&resultDetails.recordset[0]){
+                                    try{
+                                        let columnas = [];
+                                        Object.keys(resultDetails.recordset[0]).forEach(keyName => { columnas.push({header: keyName, key: keyName, width: 30}) });
+                                        //logToFile(JSON.stringify(columnas))
+                                        workSheetDetalles.columns = columnas
+                                    }catch(ex){
+                                        logToFile('se produjo un error:')
+                                        logToFile(ex)
+                                        logToFile(ex.message)
+                                        res.status(400).send(ex);
+                                        return
+                                    }
+                                }
+                                //Barre el contenido y lo agrega a la hoja de Resultados
+                                workSheetDetalles.addRows(resultDetails.recordset);
+                                logToFile("spRewMasterGetResults workSheetDetalles creado")
+                                logToFile("Perf workSheetDetalles creado :  " + ((new Date() - start) / 1000) + ' secs' )
+
+                                //Finaliza Archivo, guardándolo en servidor y lo envía a descargar
+                                logToFile("Creando archivo temporal:  " + process.env.tempFilesPath + 'Resultados.xlsx' )
+                                workbook.xlsx.writeFile(process.env.tempFilesPath + 'Resultados.xlsx').then(function() {
+                                    logToFile("Creado:  " + process.env.tempFilesPath + 'Resultados.xlsx' )
+                                    res.download((process.env.tempFilesPath + "//Resultados.xlsx"), function (err) {
+                                        logToFile("Downloading File...")
+                                        if (err) {
+                                            logToFile("Error downloading File...")
+                                        } else {
+                                            logToFile("Deleting File: " + process.env.tempFilesPath + "//Resultados.xlsx");
+                                            fs.unlink(process.env.tempFilesPath + "//Resultados.xlsx", (err) => {
+                                                if (err) {
+                                                    logToFile("Deleting File error: " + process.env.tempFilesPath + "//Resultados.xlsx");
+                                                }
+                                                logToFile("File " + process.env.tempFilesPath + "//Resultados.xlsx"  + " deleted")
+                                            });
+                                        }
+                                    })
+                                });
+                            })
+                        }catch(exDetails){
+                            logToFile("Service Error (Details")
+                            logToFile(exDetails)
+                            res.status(400).send(exDetails);
+                            return;
+                        }
+                    })
+                }catch(ex){
+                    logToFile("Service Error")
+                    logToFile(ex)
+                    res.status(400).send(ex);
+                    return;
+                }
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+//#endregion REWARDS(Comisiones)
 
 
 
