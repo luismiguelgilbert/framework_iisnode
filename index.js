@@ -1676,6 +1676,8 @@ app.post(process.env.iisVirtualPath+'spSysModulesColumnsUserUpdate', veryfyToken
                 .input('link_name', sql.VarChar(50), req.body.link_name )
                 .input('sys_user_code', sql.Int, req.body.sys_user_code )
                 .input('columns', sql.VarChar(sql.MAX), req.body.columns )
+                .input('shouldWrapCellText', sql.Bit, req.body.shouldWrapCellText )
+                .input('tableLines', sql.VarChar(50), req.body.tableLines )
                 .execute('spSysModulesColumnsUserUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
