@@ -146,8 +146,8 @@ app.post(process.env.iisVirtualPath+'spSysLogin', function (req, res) {
                 }else{
                     new sql.Request(connectionPool)
                     .input('sys_user_code', sql.Int, result.recordset[0].sys_user_code)
-                    .input('token', sql.VarChar(sql.MAX), token)
-                    .input('device_data', sql.VarChar(sql.MAX), null)//se puede agregar información adicional
+                    .input('token', sql.NVarChar(sql.MAX), token)
+                    .input('device_data', sql.NVarChar(sql.MAX), null)//se puede agregar información adicional
                     .execute('spSysLoginLogToken', (errA, resultA) => {
                         if(errA){
                             if(errA&&errA.originalError&&errA.originalError.info){
@@ -527,7 +527,7 @@ app.post(process.env.iisVirtualPath+'spAttachGenerateID', veryfyToken, function(
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('original_file_name', sql.VarChar(500), req.body.original_file_name )
-                .input('file_type', sql.VarChar(sql.MAX), req.body.file_type )
+                .input('file_type', sql.NVarChar(sql.MAX), req.body.file_type )
                 .input('file_size', sql.VarChar(sql.Int), req.body.file_size )
                 //.input('row_id', sql.Int, req.body.row_id )
                 .input('moduleName', sql.VarChar(500), req.body.moduleName )
@@ -568,7 +568,7 @@ app.post(process.env.iisVirtualPath+'saveGridUserState', veryfyToken, function(r
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('moduleName', sql.VarChar(500), req.body.moduleName )
                 .input('gridName', sql.VarChar(500), req.body.gridName )
-                .input('gridState', sql.VarChar(sql.MAX), req.body.gridState )
+                .input('gridState', sql.NVarChar(sql.MAX), req.body.gridState )
                 .execute('saveGridUserState', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -1013,8 +1013,8 @@ app.post(process.env.iisVirtualPath+'spSysTokensMobileUpdate', veryfyToken, func
             try{
                 new sql.Request(connectionPool)
                 .input('userCode', sql.Int, req.body.userCode )
-                .input('token', sql.VarChar(sql.MAX), req.body.token )
-                .input('deviceData', sql.VarChar(sql.MAX), req.body.deviceData )
+                .input('token', sql.NVarChar(sql.MAX), req.body.token )
+                .input('deviceData', sql.NVarChar(sql.MAX), req.body.deviceData )
                 .execute('spSysTokensMobileUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -1480,8 +1480,8 @@ app.post(process.env.iisVirtualPath+'getData', veryfyToken, function(req, res) {
                 .input('sys_company_id', sql.Int, req.body.sys_company_id )
                 .input('gridDataSkip', sql.BigInt, req.body.gridDataSkip )
                 .input('gridNumberOfRows', sql.BigInt, req.body.gridNumberOfRows )
-                .input('gridColumns', sql.VarChar(sql.MAX), req.body.gridColumns )
-                .input('filterBy', sql.VarChar(sql.MAX), req.body.filterBy )
+                .input('gridColumns', sql.NVarChar(sql.MAX), req.body.gridColumns )
+                .input('filterBy', sql.NVarChar(sql.MAX), req.body.filterBy )
                 .input('filterSearch', sql.VarChar(100), req.body.filterSearch )
                 .input('sortBy', sql.VarChar(50), req.body.sortBy )
                 .input('orderBy', sql.VarChar(50), req.body.orderBy )
@@ -1538,12 +1538,12 @@ app.post(process.env.iisVirtualPath+'getDataDX', veryfyToken, function(req, res)
                 .input('link_name', sql.VarChar(50), req.body.link_name )
                 .input('sys_user_code', sql.Int, req.body.sys_user_code )
                 .input('sys_company_id', sql.Int, req.body.sys_company_id )
-                .input('select', sql.VarChar(sql.MAX), req.body.select )
+                .input('select', sql.NVarChar(sql.MAX), req.body.select )
                 .input('take', sql.BigInt, req.body.take )
                 .input('skip', sql.BigInt, req.body.skip )
-                .input('searchValue', sql.VarChar(sql.MAX), req.body.searchValue )
-                .input('filter', sql.VarChar(sql.MAX), req.body.filter )
-                .input('sortBy', sql.VarChar(sql.MAX), req.body.sortBy )
+                .input('searchValue', sql.NVarChar(sql.MAX), req.body.searchValue )
+                .input('filter', sql.NVarChar(sql.MAX), req.body.filter )
+                .input('sortBy', sql.NVarChar(sql.MAX), req.body.sortBy )
                 .execute('spGetDataSelectDX', (err, result) => {
                     if(err){
                         logToFile("DB Error 1:  " + err.procName)
@@ -1675,7 +1675,7 @@ app.post(process.env.iisVirtualPath+'spSysModulesColumnsUserUpdate', veryfyToken
                 new sql.Request(connectionPool)
                 .input('link_name', sql.VarChar(50), req.body.link_name )
                 .input('sys_user_code', sql.Int, req.body.sys_user_code )
-                .input('columns', sql.VarChar(sql.MAX), req.body.columns )
+                .input('columns', sql.NVarChar(sql.MAX), req.body.columns )
                 .input('shouldWrapCellText', sql.Bit, req.body.shouldWrapCellText )
                 .input('tableLines', sql.VarChar(50), req.body.tableLines )
                 .execute('spSysModulesColumnsUserUpdate', (err, result) => {
@@ -1715,7 +1715,7 @@ app.post(process.env.iisVirtualPath+'spSysModulesFiltersUserUpdate', veryfyToken
                 .input('sys_user_code', sql.Int, req.body.sys_user_code )
                 .input('filter_id', sql.Int, req.body.filter_id )
                 .input('name', sql.VarChar(250), req.body.name )
-                .input('conditions', sql.VarChar(sql.MAX), req.body.conditions )
+                .input('conditions', sql.NVarChar(sql.MAX), req.body.conditions )
                 .execute('spSysModulesFiltersUserUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -1856,7 +1856,7 @@ app.post(process.env.iisVirtualPath+'spSysUsersUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysUsersUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -1891,7 +1891,7 @@ app.post(process.env.iisVirtualPath+'spSysUsersPreferencesUpdate', veryfyToken, 
             try{
                 new sql.Request(connectionPool)
                 .input('sys_user_code', sql.Int, req.body.sys_user_code )
-                .input('user_data', sql.VarChar(sql.MAX), req.body.user_data )
+                .input('user_data', sql.NVarChar(sql.MAX), req.body.user_data )
                 .execute('spSysUsersPreferencesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -1927,7 +1927,7 @@ app.post(process.env.iisVirtualPath+'sp_sys_user_picture_upload', veryfyToken, f
                 new sql.Request(connectionPool)
                 .input('sys_user_code', sql.Int, req.body.sys_user_code )
                 .input('original_file_name', sql.VarChar(500), req.body.original_file_name )
-                .input('file_type', sql.VarChar(sql.MAX), req.body.file_type )
+                .input('file_type', sql.NVarChar(sql.MAX), req.body.file_type )
                 .input('file_size', sql.VarChar(sql.Int), req.body.file_size )
                 .input('editing_sys_user_code', sql.VarChar(sql.Int), req.body.editing_sys_user_code )
                 .execute('sp_sys_user_picture_upload', (err, result) => {
@@ -1998,7 +1998,7 @@ app.post(process.env.iisVirtualPath+'spSysProfilesUpdate', veryfyToken, function
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('userLanguage', sql.VarChar(50), req.body.userLanguage )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysProfilesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2066,7 +2066,7 @@ app.post(process.env.iisVirtualPath+'spSysCompaniesUpdate', veryfyToken, functio
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysCompaniesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2134,7 +2134,7 @@ app.post(process.env.iisVirtualPath+'spSysModulesUpdate', veryfyToken, function(
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysModulesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2203,7 +2203,7 @@ app.post(process.env.iisVirtualPath+'spNotificationsUpdate', veryfyToken, functi
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spNotificationsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2272,7 +2272,7 @@ app.post(process.env.iisVirtualPath+'spAccAccountsUpdate', veryfyToken, function
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccAccountsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2341,7 +2341,7 @@ app.post(process.env.iisVirtualPath+'spSysTaxesUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysTaxesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2410,7 +2410,7 @@ app.post(process.env.iisVirtualPath+'spAccTaxesUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccTaxesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2479,7 +2479,7 @@ app.post(process.env.iisVirtualPath+'spAccPeriodsUpdate', veryfyToken, function(
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccPeriodsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2548,7 +2548,7 @@ app.post(process.env.iisVirtualPath+'spAccPaytermsUpdate', veryfyToken, function
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccPaytermsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2617,7 +2617,7 @@ app.post(process.env.iisVirtualPath+'spSysCompLocUpdate', veryfyToken, function(
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSysCompLocUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2686,7 +2686,7 @@ app.post(process.env.iisVirtualPath+'spPartnerMasterUpdate', veryfyToken, functi
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spPartnerMasterUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2755,7 +2755,7 @@ app.post(process.env.iisVirtualPath+'spPartnerMasterGroupsUpdate', veryfyToken, 
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spPartnerMasterGroupsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2824,7 +2824,7 @@ app.post(process.env.iisVirtualPath+'spInvMasterUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvMasterUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2893,7 +2893,7 @@ app.post(process.env.iisVirtualPath+'spInvMasterGroupsUpdate', veryfyToken, func
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvMasterGroupsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -2962,7 +2962,7 @@ app.post(process.env.iisVirtualPath+'spWhMasterUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spWhMasterUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -3031,7 +3031,7 @@ app.post(process.env.iisVirtualPath+'spInvMasterUoMUpdate', veryfyToken, functio
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvMasterUoMUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -3100,7 +3100,7 @@ app.post(process.env.iisVirtualPath+'spInvMasterBrandsUpdate', veryfyToken, func
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvMasterBrandsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -3169,7 +3169,7 @@ app.post(process.env.iisVirtualPath+'spinvMasterTypesUpdate', veryfyToken, funct
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spinvMasterTypesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Perf spinvMasterTypesUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -3242,7 +3242,7 @@ app.post(process.env.iisVirtualPath+'spMktPRUpdate', veryfyToken, function(req, 
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spMktPRUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -3340,7 +3340,7 @@ app.post(process.env.iisVirtualPath+'spMktPOUpdate', veryfyToken, function(req, 
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spMktPOUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -3438,7 +3438,7 @@ app.post(process.env.iisVirtualPath+'spMktPORetUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spMktPORetUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -3538,7 +3538,7 @@ app.post(process.env.iisVirtualPath+'spInvKardexIncomingUpdate', veryfyToken, fu
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvKardexIncomingUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -3607,7 +3607,7 @@ app.post(process.env.iisVirtualPath+'spInvKardexOutgoingUpdate', veryfyToken, fu
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spInvKardexOutgoingUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -3799,7 +3799,7 @@ app.post(process.env.iisVirtualPath+'spAccMovesUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccMovesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -3987,7 +3987,7 @@ app.post(process.env.iisVirtualPath+'spAccAPUpdate', veryfyToken, function(req, 
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccAPUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4084,7 +4084,7 @@ app.post(process.env.iisVirtualPath+'spAccRETUpdate', veryfyToken, function(req,
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccRETUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Perf spAccRETUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -4120,7 +4120,7 @@ app.post(process.env.iisVirtualPath+'spAccRETAsistantUpdate', veryfyToken, funct
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccRETAsistantUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Perf spAccRETAsistantUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -4188,7 +4188,7 @@ app.post(process.env.iisVirtualPath+'spAccPaymentMethodsUpdate', veryfyToken, fu
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccPaymentMethodsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4257,7 +4257,7 @@ app.post(process.env.iisVirtualPath+'spAccvoucherOutUpdate', veryfyToken, functi
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccvoucherOutUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4349,7 +4349,7 @@ app.post(process.env.iisVirtualPath+'spAccVoucherOutAssistantUpdate', veryfyToke
                 new sql.Request(connectionPool)
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spAccVoucherOutAssistantUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4550,7 +4550,7 @@ app.post(process.env.iisVirtualPath+'spCasCasesTypesUpdate', veryfyToken, functi
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasCasesTypesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4619,7 +4619,7 @@ app.post(process.env.iisVirtualPath+'spCasTasksTypesUpdate', veryfyToken, functi
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasTasksTypesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4688,7 +4688,7 @@ app.post(process.env.iisVirtualPath+'spCasLocationsUpdate', veryfyToken, functio
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasLocationsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4757,7 +4757,7 @@ app.post(process.env.iisVirtualPath+'spCasClientesUpdate', veryfyToken, function
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasClientesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4826,7 +4826,7 @@ app.post(process.env.iisVirtualPath+'spCasContratosUpdate', veryfyToken, functio
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasContratosUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4895,7 +4895,7 @@ app.post(process.env.iisVirtualPath+'spCasCasesUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasCasesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -4964,7 +4964,7 @@ app.post(process.env.iisVirtualPath+'spCasCasesTasksUpdate', veryfyToken, functi
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasCasesTasksUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5033,7 +5033,7 @@ app.post(process.env.iisVirtualPath+'spCasInvoicesUpdate', veryfyToken, function
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spCasInvoicesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5136,7 +5136,7 @@ app.post(process.env.iisVirtualPath+'spMfgLocationsUpdate', veryfyToken, functio
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spMfgLocationsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5205,7 +5205,7 @@ app.post(process.env.iisVirtualPath+'spMfgTypesUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spMfgTypesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5274,7 +5274,7 @@ app.post(process.env.iisVirtualPath+'spMfgBudgetUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spMfgBudgetUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5343,7 +5343,7 @@ app.post(process.env.iisVirtualPath+'spMfgOrdersUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spMfgOrdersUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5412,7 +5412,7 @@ app.post(process.env.iisVirtualPath+'spmktMFGUpdate', veryfyToken, function(req,
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spmktMFGUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5538,7 +5538,7 @@ app.post(process.env.iisVirtualPath+'spmktMFGRetUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spmktMFGRetUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5635,7 +5635,7 @@ app.post(process.env.iisVirtualPath+'spMktPRDUpdate', veryfyToken, function(req,
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spMktPRDUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5732,7 +5732,7 @@ app.post(process.env.iisVirtualPath+'spMktPRDRetUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spMktPRDRetUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5806,7 +5806,7 @@ app.post(process.env.iisVirtualPath+'spSchPersonasUpdate', veryfyToken, function
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchPersonasUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5875,7 +5875,7 @@ app.post(process.env.iisVirtualPath+'spSchGroupsUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchGroupsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -5944,7 +5944,7 @@ app.post(process.env.iisVirtualPath+'spSchSectoresUpdate', veryfyToken, function
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchSectoresUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6013,7 +6013,7 @@ app.post(process.env.iisVirtualPath+'spSchApostoladosUpdate', veryfyToken, funct
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchApostoladosUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6082,7 +6082,7 @@ app.post(process.env.iisVirtualPath+'spSchFormacionesUpdate', veryfyToken, funct
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spSchFormacionesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6153,7 +6153,7 @@ app.post(process.env.iisVirtualPath+'spBitaplacesUpdate', veryfyToken, function(
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spBitaplacesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6222,7 +6222,7 @@ app.post(process.env.iisVirtualPath+'spBitaCarsUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spBitaCarsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6346,7 +6346,7 @@ app.post(process.env.iisVirtualPath+'spBitaeventsUpdate', veryfyToken, function(
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spBitaeventsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6443,7 +6443,7 @@ app.post(process.env.iisVirtualPath+'spBitapeopleUpdate', veryfyToken, function(
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spBitapeopleUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6540,7 +6540,7 @@ app.post(process.env.iisVirtualPath+'spBitaridesUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spBitaridesUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6611,7 +6611,7 @@ app.post(process.env.iisVirtualPath+'spEnsPersonasUpdate', veryfyToken, function
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spEnsPersonasUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6709,7 +6709,7 @@ app.post(process.env.iisVirtualPath+'spEnsTeamsUpdate', veryfyToken, function(re
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spEnsTeamsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6778,7 +6778,7 @@ app.post(process.env.iisVirtualPath+'spEnsServiciosUpdate', veryfyToken, functio
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spEnsServiciosUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6847,7 +6847,7 @@ app.post(process.env.iisVirtualPath+'spEnsLibrosUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spEnsLibrosUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -6886,7 +6886,7 @@ app.get(process.env.iisVirtualPath+'spEnsJobSearch', veryfyToken, function(req, 
             .input('userCode', sql.Int, req.query.userCode )
             .input('userCompany', sql.Int, req.query.userCompany )
             .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
-            .input('searchString', sql.VarChar(sql.MAX), req.query.searchString )
+            .input('searchString', sql.NVarChar(sql.MAX), req.query.searchString )
             .execute('spEnsJobSearch', (err, result) => {
                 logToFile("Request:  " + req.originalUrl)
                 logToFile("Perf spEnsJobSearch:  " + ((new Date() - start) / 1000) + ' secs' )
@@ -6947,7 +6947,7 @@ app.post(process.env.iisVirtualPath+'spEnsMeetTeamUpdate', veryfyToken, function
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spEnsMeetTeamUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -7016,7 +7016,7 @@ app.post(process.env.iisVirtualPath+'spEnsPilotMeetUpdate', veryfyToken, functio
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spEnsPilotMeetUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -7085,7 +7085,7 @@ app.post(process.env.iisVirtualPath+'spEnsWorkMeetUpdate', veryfyToken, function
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spEnsWorkMeetUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -7182,7 +7182,7 @@ app.post(process.env.iisVirtualPath+'spRewMasterUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spRewMasterUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -7248,9 +7248,9 @@ app.post(process.env.iisVirtualPath+'spRewMasterGetResults', veryfyToken, functi
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('rewTableID', sql.Int, req.body.rewTableID )
-                .input('rewMasterResults', sql.VarChar(sql.MAX), req.body.rewMasterResults )
-                .input('rewMasterResultsLines', sql.VarChar(sql.MAX), req.body.rewMasterResultsLines )
-                .input('selected', sql.VarChar(sql.MAX), req.body.selected )
+                .input('rewMasterResults', sql.NVarChar(sql.MAX), req.body.rewMasterResults )
+                .input('rewMasterResultsLines', sql.NVarChar(sql.MAX), req.body.rewMasterResultsLines )
+                .input('selected', sql.NVarChar(sql.MAX), req.body.selected )
                 .execute('spRewMasterGetResults', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
@@ -7290,9 +7290,9 @@ app.post(process.env.iisVirtualPath+'spRewMasterGetResultsDetails', veryfyToken,
                     .input('userCode', sql.Int, req.body.userCode )
                     .input('userCompany', sql.Int, req.body.userCompany )
                     .input('rewTableID', sql.Int, req.body.rewTableID )
-                    .input('rewMasterResults', sql.VarChar(sql.MAX), req.body.rewMasterResults )
-                    .input('rewMasterResultsLines', sql.VarChar(sql.MAX), req.body.rewMasterResultsLines )
-                    .input('selected', sql.VarChar(sql.MAX), req.body.selected )
+                    .input('rewMasterResults', sql.NVarChar(sql.MAX), req.body.rewMasterResults )
+                    .input('rewMasterResultsLines', sql.NVarChar(sql.MAX), req.body.rewMasterResultsLines )
+                    .input('selected', sql.NVarChar(sql.MAX), req.body.selected )
                     .execute('spRewMasterGetResults', (err, result) => {
                         logToFile("Request:  " + req.originalUrl)
                         logToFile("Request:  " + JSON.stringify(req.body))
@@ -7343,9 +7343,9 @@ app.post(process.env.iisVirtualPath+'spRewMasterGetResultsDetails', veryfyToken,
                             .input('userCode', sql.Int, req.body.userCode )
                             .input('userCompany', sql.Int, req.body.userCompany )
                             .input('rewTableID', sql.Int, req.body.rewTableID )
-                            .input('rewMasterResults', sql.VarChar(sql.MAX), req.body.rewMasterResults )
-                            .input('rewMasterResultsLines', sql.VarChar(sql.MAX), req.body.rewMasterResultsLines )
-                            .input('selected', sql.VarChar(sql.MAX), req.body.selected )
+                            .input('rewMasterResults', sql.NVarChar(sql.MAX), req.body.rewMasterResults )
+                            .input('rewMasterResultsLines', sql.NVarChar(sql.MAX), req.body.rewMasterResultsLines )
+                            .input('selected', sql.NVarChar(sql.MAX), req.body.selected )
                             .execute('spRewMasterGetResultsDetails', (errDetails, resultDetails) => {
                                 logToFile("Perf spRewMasterGetResultsDetails :  " + ((new Date() - start) / 1000) + ' secs' )
                                 if(errDetails){
@@ -7474,7 +7474,7 @@ app.post(process.env.iisVirtualPath+'spEnsEventsUpdate', veryfyToken, function(r
                 .input('userCode', sql.Int, req.body.userCode )
                 .input('userCompany', sql.Int, req.body.userCompany )
                 .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.VarChar(sql.MAX), req.body.editRecord )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
                 .execute('spEnsEventsUpdate', (err, result) => {
                     logToFile("Request:  " + req.originalUrl)
                     logToFile("Request:  " + JSON.stringify(req.body))
