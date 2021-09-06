@@ -7335,8 +7335,8 @@ app.post(process.env.iisVirtualPath+'spRewMasterGetResultsDetails', veryfyToken,
 
                       
 
-                        //2.- Ahora, Agrega la hoja de Datos
-                        logToFile("spRewMasterGetResults obteniendo detalles...")
+                        //2.- Ahora, Agrega la hoja de Datos Agrupados
+                        logToFile("spRewMasterGetResults obteniendo detalle agrupado...")
                         start = new Date() //para calcular creación de página
                         try{
                             new sql.Request(connectionPool)
@@ -7346,34 +7346,34 @@ app.post(process.env.iisVirtualPath+'spRewMasterGetResultsDetails', veryfyToken,
                             .input('rewMasterResults', sql.NVarChar(sql.MAX), req.body.rewMasterResults )
                             .input('rewMasterResultsLines', sql.NVarChar(sql.MAX), req.body.rewMasterResultsLines )
                             .input('selected', sql.NVarChar(sql.MAX), req.body.selected )
-                            .execute('spRewMasterGetResultsDetails', (errDetails, resultDetails) => {
-                                logToFile("Perf spRewMasterGetResultsDetails :  " + ((new Date() - start) / 1000) + ' secs' )
-                                if(errDetails){
-                                    if(errDetails&&errDetails.originalError&&errDetails.originalError.info){
-                                        logToFile('DB Error: ' + JSON.stringify(errDetails.originalError.info))
+                            .execute('spRewMasterGetResultsDetailsGrouped', (errDetailsGrouped, resultDetailsGrouped) => {
+                                logToFile("Perf spRewMasterGetResultsDetailsGrouped :  " + ((new Date() - start) / 1000) + ' secs' )
+                                if(errDetailsGrouped){
+                                    if(errDetailsGrouped&&errDetailsGrouped.originalError&&errDetailsGrouped.originalError.info){
+                                        logToFile('DB Error: ' + JSON.stringify(errDetailsGrouped.originalError.info))
                                     }else{
-                                        logToFile('DB Error: ' + JSON.stringify(errDetails.originalError))
+                                        logToFile('DB Error: ' + JSON.stringify(errDetailsGrouped.originalError))
                                     }
-                                    res.status(400).send(errDetails.originalError);
+                                    res.status(400).send(errDetailsGrouped.originalError);
                                     return;
                                 }
                                 start = new Date() //para calcular creación de página
-                                logToFile("spRewMasterGetResults creando workSheetDetalles")
-                                //Crear worksheet Detalles
-                                const workSheetDetalles = workbook.addWorksheet('Detalles');
+                                logToFile("spRewMasterGetResults creando workSheetDetallesGrouped")
+                                //Crear worksheet Detalles Grouped
+                                const workSheetDetallesGrouped = workbook.addWorksheet('Documentos');
                                 //Freeze 1a fila
-                                workSheetDetalles.views = [
+                                workSheetDetallesGrouped.views = [
                                     {state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'A2'}
                                 ];
                                 //Pone 1a Fila en Negritas
-                                workSheetDetalles.getRow(1).font = { bold: true };
+                                workSheetDetallesGrouped.getRow(1).font = { bold: true };
                                 //Agrega Columnas
-                                if(resultDetails&&resultDetails.recordset&&resultDetails.recordset[0]){
+                                if(resultDetailsGrouped&&resultDetailsGrouped.recordset&&resultDetailsGrouped.recordset[0]){
                                     try{
                                         let columnas = [];
-                                        Object.keys(resultDetails.recordset[0]).forEach(keyName => { columnas.push({header: keyName, key: keyName, width: 30}) });
+                                        Object.keys(resultDetailsGrouped.recordset[0]).forEach(keyName => { columnas.push({header: keyName, key: keyName, width: 30}) });
                                         //logToFile(JSON.stringify(columnas))
-                                        workSheetDetalles.columns = columnas
+                                        workSheetDetallesGrouped.columns = columnas
                                     }catch(ex){
                                         logToFile('se produjo un error:')
                                         logToFile(ex)
@@ -7383,34 +7383,94 @@ app.post(process.env.iisVirtualPath+'spRewMasterGetResultsDetails', veryfyToken,
                                     }
                                 }
                                 //Barre el contenido y lo agrega a la hoja de Resultados
-                                workSheetDetalles.addRows(resultDetails.recordset);
-                                logToFile("spRewMasterGetResults workSheetDetalles creado")
-                                logToFile("Perf workSheetDetalles creado :  " + ((new Date() - start) / 1000) + ' secs' )
+                                workSheetDetallesGrouped.addRows(resultDetailsGrouped.recordset);
+                                logToFile("spRewMasterGetResults workSheetDetallesGrouped creado")
+                                logToFile("Perf workSheetDetallesGrouped creado :  " + ((new Date() - start) / 1000) + ' secs' )
 
-                                //Finaliza Archivo, guardándolo en servidor y lo envía a descargar
-                                logToFile("Creando archivo temporal:  " + process.env.tempFilesPath + 'Resultados.xlsx' )
-                                workbook.xlsx.writeFile(process.env.tempFilesPath + 'Resultados.xlsx').then(function() {
-                                    logToFile("Creado:  " + process.env.tempFilesPath + 'Resultados.xlsx' )
-                                    res.download((process.env.tempFilesPath + "//Resultados.xlsx"), function (err) {
-                                        logToFile("Downloading File...")
-                                        if (err) {
-                                            logToFile("Error downloading File...")
-                                        } else {
-                                            logToFile("Deleting File: " + process.env.tempFilesPath + "//Resultados.xlsx");
-                                            fs.unlink(process.env.tempFilesPath + "//Resultados.xlsx", (err) => {
-                                                if (err) {
-                                                    logToFile("Deleting File error: " + process.env.tempFilesPath + "//Resultados.xlsx");
-                                                }
-                                                logToFile("File " + process.env.tempFilesPath + "//Resultados.xlsx"  + " deleted")
-                                            });
+
+                                //3.- Ahora, Agrega la hoja de Datos
+                                logToFile("spRewMasterGetResults obteniendo detalles...")
+                                start = new Date() //para calcular creación de página
+                                try{
+                                    new sql.Request(connectionPool)
+                                    .input('userCode', sql.Int, req.body.userCode )
+                                    .input('userCompany', sql.Int, req.body.userCompany )
+                                    .input('rewTableID', sql.Int, req.body.rewTableID )
+                                    .input('rewMasterResults', sql.NVarChar(sql.MAX), req.body.rewMasterResults )
+                                    .input('rewMasterResultsLines', sql.NVarChar(sql.MAX), req.body.rewMasterResultsLines )
+                                    .input('selected', sql.NVarChar(sql.MAX), req.body.selected )
+                                    .execute('spRewMasterGetResultsDetails', (errDetails, resultDetails) => {
+                                        logToFile("Perf spRewMasterGetResultsDetails :  " + ((new Date() - start) / 1000) + ' secs' )
+                                        if(errDetails){
+                                            if(errDetails&&errDetails.originalError&&errDetails.originalError.info){
+                                                logToFile('DB Error: ' + JSON.stringify(errDetails.originalError.info))
+                                            }else{
+                                                logToFile('DB Error: ' + JSON.stringify(errDetails.originalError))
+                                            }
+                                            res.status(400).send(errDetails.originalError);
+                                            return;
                                         }
+                                        start = new Date() //para calcular creación de página
+                                        logToFile("spRewMasterGetResults creando workSheetDetalles")
+                                        //Crear worksheet Detalles
+                                        const workSheetDetalles = workbook.addWorksheet('Detalles');
+                                        //Freeze 1a fila
+                                        workSheetDetalles.views = [
+                                            {state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'A2'}
+                                        ];
+                                        //Pone 1a Fila en Negritas
+                                        workSheetDetalles.getRow(1).font = { bold: true };
+                                        //Agrega Columnas
+                                        if(resultDetails&&resultDetails.recordset&&resultDetails.recordset[0]){
+                                            try{
+                                                let columnas = [];
+                                                Object.keys(resultDetails.recordset[0]).forEach(keyName => { columnas.push({header: keyName, key: keyName, width: 30}) });
+                                                //logToFile(JSON.stringify(columnas))
+                                                workSheetDetalles.columns = columnas
+                                            }catch(ex){
+                                                logToFile('se produjo un error:')
+                                                logToFile(ex)
+                                                logToFile(ex.message)
+                                                res.status(400).send(ex);
+                                                return
+                                            }
+                                        }
+                                        //Barre el contenido y lo agrega a la hoja de Resultados
+                                        workSheetDetalles.addRows(resultDetails.recordset);
+                                        logToFile("spRewMasterGetResults workSheetDetalles creado")
+                                        logToFile("Perf workSheetDetalles creado :  " + ((new Date() - start) / 1000) + ' secs' )
+
+                                        //Finaliza Archivo, guardándolo en servidor y lo envía a descargar
+                                        logToFile("Creando archivo temporal:  " + process.env.tempFilesPath + 'Resultados.xlsx' )
+                                        workbook.xlsx.writeFile(process.env.tempFilesPath + 'Resultados.xlsx').then(function() {
+                                            logToFile("Creado:  " + process.env.tempFilesPath + 'Resultados.xlsx' )
+                                            res.download((process.env.tempFilesPath + "//Resultados.xlsx"), function (err) {
+                                                logToFile("Downloading File...")
+                                                if (err) {
+                                                    logToFile("Error downloading File...")
+                                                } else {
+                                                    logToFile("Deleting File: " + process.env.tempFilesPath + "//Resultados.xlsx");
+                                                    fs.unlink(process.env.tempFilesPath + "//Resultados.xlsx", (err) => {
+                                                        if (err) {
+                                                            logToFile("Deleting File error: " + process.env.tempFilesPath + "//Resultados.xlsx");
+                                                        }
+                                                        logToFile("File " + process.env.tempFilesPath + "//Resultados.xlsx"  + " deleted")
+                                                    });
+                                                }
+                                            })
+                                        });
                                     })
-                                });
+                                }catch(exDetails){
+                                    logToFile("Service Error (Details")
+                                    logToFile(exDetails)
+                                    res.status(400).send(exDetails);
+                                    return;
+                                }
                             })
-                        }catch(exDetails){
-                            logToFile("Service Error (Details")
-                            logToFile(exDetails)
-                            res.status(400).send(exDetails);
+                        }catch(ex){
+                            logToFile("Service Error")
+                            logToFile(ex)
+                            res.status(400).send(ex);
                             return;
                         }
                     })
