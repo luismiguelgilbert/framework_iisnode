@@ -4013,138 +4013,6 @@ app.post(process.env.iisVirtualPath+'spAccAPUpdate', veryfyToken, function(req, 
 })
 //#endregion AP_INVOICES
 
-//#region ACCRET_Retenciones
-app.get(process.env.iisVirtualPath+'spAccRETSelectEdit', veryfyToken, function(req, res) {
-    let start = new Date()
-    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
-        if(jwtError){
-            logToFile("JWT Error:")
-            logToFile(jwtError)
-            res.status(403).send(jwtError);
-        }else{
-            new sql.Request(connectionPool)
-            .input('userCode', sql.Int, req.query.userCode )
-            .input('userCompany', sql.Int, req.query.userCompany )
-            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
-            .input('row_id', sql.Int, req.query.row_id )
-            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
-            .execute('spAccRETSelectEdit', (err, result) => {
-                logToFile("Request:  " + req.originalUrl)
-                logToFile("Perf spAccRETSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
-                if(err){
-                    logToFile("DB Error:  " + err.procName)
-                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
-                    res.status(400).send(err.originalError);
-                    return;
-                }
-                res.setHeader('content-type', 'application/json');
-                res.status(200).send(result.recordset);
-            })
-        }
-    })
-})
-app.get(process.env.iisVirtualPath+'spAccRETSelectPendingInvoices', veryfyToken, function(req, res) {
-    let start = new Date()
-    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
-        if(jwtError){
-            logToFile("JWT Error:")
-            logToFile(jwtError)
-            res.status(403).send(jwtError);
-        }else{
-            new sql.Request(connectionPool)
-            .input('userCode', sql.Int, req.query.userCode )
-            .input('userCompany', sql.Int, req.query.userCompany )
-            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
-            .input('partnerID', sql.Int, req.query.partnerID )
-            .execute('spAccRETSelectPendingInvoices', (err, result) => {
-                logToFile("Request:  " + req.originalUrl)
-                logToFile("Perf spAccRETSelectPendingInvoices:  " + ((new Date() - start) / 1000) + ' secs' )
-                if(err){
-                    logToFile("DB Error:  " + err.procName)
-                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
-                    res.status(400).send(err.originalError);
-                    return;
-                }
-                res.setHeader('content-type', 'application/json');
-                res.status(200).send(result.recordset);
-            })
-        }
-    })
-})
-app.post(process.env.iisVirtualPath+'spAccRETUpdate', veryfyToken, function(req, res) {
-    let start = new Date()
-    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
-        if(jwtError){
-            logToFile("JWT Error:")
-            logToFile(jwtError)
-            res.status(403).send(jwtError);
-        }else{
-            try{
-                new sql.Request(connectionPool)
-                .input('userCode', sql.Int, req.body.userCode )
-                .input('userCompany', sql.Int, req.body.userCompany )
-                .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
-                .execute('spAccRETUpdate', (err, result) => {
-                    logToFile("Request:  " + req.originalUrl)
-                    logToFile("Perf spAccRETUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
-
-                    if(err){
-                        logToFile("DB Error:  " + err.procName)
-                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
-                        res.status(400).send(err.originalError);
-                        return;
-                    }
-                    res.setHeader('content-type', 'application/json');
-                    res.status(200).send(result.recordset);
-                })
-            }catch(ex){
-                logToFile("Service Error")
-                logToFile(ex)
-                res.status(400).send(ex);
-                return;
-            }
-        }
-    })
-})
-app.post(process.env.iisVirtualPath+'spAccRETAsistantUpdate', veryfyToken, function(req, res) {
-    let start = new Date()
-    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
-        if(jwtError){
-            logToFile("JWT Error:")
-            logToFile(jwtError)
-            res.status(403).send(jwtError);
-        }else{
-            try{
-                new sql.Request(connectionPool)
-                .input('userCode', sql.Int, req.body.userCode )
-                .input('userCompany', sql.Int, req.body.userCompany )
-                .input('row_id', sql.Int, req.body.row_id )
-                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
-                .execute('spAccRETAsistantUpdate', (err, result) => {
-                    logToFile("Request:  " + req.originalUrl)
-                    logToFile("Perf spAccRETAsistantUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
-
-                    if(err){
-                        logToFile("DB Error:  " + err.procName)
-                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
-                        res.status(400).send(err.originalError);
-                        return;
-                    }
-                    res.setHeader('content-type', 'application/json');
-                    res.status(200).send(result.recordset);
-                })
-            }catch(ex){
-                logToFile("Service Error")
-                logToFile(ex)
-                res.status(400).send(ex);
-                return;
-            }
-        }
-    })
-})
-//#endregion ACCRET_Retenciones
-
 //#region accPaymentMethods
 app.get(process.env.iisVirtualPath+'spAccPaymentMethodsSelectEdit', veryfyToken, function(req, res) {
     let start = new Date()
@@ -4500,6 +4368,137 @@ app.get(process.env.iisVirtualPath+'spAccRetOutAssistantDocsByPartner', veryfyTo
         }
     })
 })
+app.post(process.env.iisVirtualPath+'spAccRetOutAsistantUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
+                .execute('spAccRetOutAsistantUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spAccRetOutAsistantUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+app.get(process.env.iisVirtualPath+'spAccRetOutSelectEdit', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('row_id', sql.Int, req.query.row_id )
+            .input('editMode', req.query.editMode )//.input('editMode', sql.Bit, req.query.editMode )
+            .execute('spAccRetOutSelectEdit', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spAccRetOutSelectEdit:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.get(process.env.iisVirtualPath+'spAccRetOutSelectPendingInvoices', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            new sql.Request(connectionPool)
+            .input('userCode', sql.Int, req.query.userCode )
+            .input('userCompany', sql.Int, req.query.userCompany )
+            .input('userLanguage', sql.VarChar(50), req.query.userLanguage )
+            .input('partnerID', sql.Int, req.query.partnerID )
+            .execute('spAccRetOutSelectPendingInvoices', (err, result) => {
+                logToFile("Request:  " + req.originalUrl)
+                logToFile("Perf spAccRetOutSelectPendingInvoices:  " + ((new Date() - start) / 1000) + ' secs' )
+                if(err){
+                    logToFile("DB Error:  " + err.procName)
+                    logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                    res.status(400).send(err.originalError);
+                    return;
+                }
+                res.setHeader('content-type', 'application/json');
+                res.status(200).send(result.recordset);
+            })
+        }
+    })
+})
+app.post(process.env.iisVirtualPath+'spAccRetOutUpdate', veryfyToken, function(req, res) {
+    let start = new Date()
+    jwt.verify(req.token, process.env.secretEncryptionJWT, (jwtError, authData) => {
+        if(jwtError){
+            logToFile("JWT Error:")
+            logToFile(jwtError)
+            res.status(403).send(jwtError);
+        }else{
+            try{
+                new sql.Request(connectionPool)
+                .input('userCode', sql.Int, req.body.userCode )
+                .input('userCompany', sql.Int, req.body.userCompany )
+                .input('row_id', sql.Int, req.body.row_id )
+                .input('editRecord', sql.NVarChar(sql.MAX), req.body.editRecord )
+                .execute('spAccRetOutUpdate', (err, result) => {
+                    logToFile("Request:  " + req.originalUrl)
+                    logToFile("Perf spAccRetOutUpdate:  " + ((new Date() - start) / 1000) + ' secs' )
+
+                    if(err){
+                        logToFile("DB Error:  " + err.procName)
+                        logToFile("Error:  " + JSON.stringify(err.originalError.info))
+                        res.status(400).send(err.originalError);
+                        return;
+                    }
+                    res.setHeader('content-type', 'application/json');
+                    res.status(200).send(result.recordset);
+                })
+            }catch(ex){
+                logToFile("Service Error")
+                logToFile(ex)
+                res.status(400).send(ex);
+                return;
+            }
+        }
+    })
+})
+
+
 //#endregion spAccRetOutAssistant
 
 //#endregion Version_1_0_0
